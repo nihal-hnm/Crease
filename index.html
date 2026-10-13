@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Crease — Cricket Stats Visualizer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@500;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="wrap">
+<header><span class="brand">Crease</span><div><button class="btn" id="csv">Export CSV</button> <button class="btn" id="theme">Theme</button></div></header>
+<h1>Settle the argument<br>with the numbers.</h1>
+<p class="sub">Career batting records across three formats. Switch format, pick two players for a head-to-head, then filter the table and charts below.</p>
+<div class="seg" id="fmt" role="group" aria-label="Format"><button data-f="ODI" aria-pressed="true">ODI</button><button data-f="Test" aria-pressed="false">Test</button><button data-f="T20I" aria-pressed="false">T20I</button></div>
+
+<section class="panel" aria-label="Player comparison">
+<h2>Head to head</h2>
+<div class="vs"><label><select id="pa" aria-label="Player A"></select></label><span class="x">vs</span><label><select id="pb" aria-label="Player B"></select></label></div>
+<div class="verdict" id="verdict"></div>
+<div class="cmp" id="cmp"></div>
+<div class="grid2"><div class="cv"><canvas id="radar"></canvas></div><div class="cv"><canvas id="bar"></canvas></div></div>
+</section>
+
+<section class="panel" style="margin-top:16px" aria-label="Player dataset and filters">
+<h2>Players</h2>
+<div class="filters">
+<label>Search<input id="q" type="search" placeholder="Name"></label>
+<label>Team<select id="team"><option value="">All teams</option></select></label>
+<label>Min average: <span id="avgv">0</span><input id="avg" type="range" min="0" max="60" step="1" value="0"></label>
+<label>Min 100s: <span id="hv">0</span><input id="h" type="range" min="0" max="50" step="1" value="0"></label>
+<button class="btn" id="reset">Reset filters</button>
+</div>
+<div class="tw"><table><thead><tr id="th"></tr></thead><tbody id="tb"></tbody></table></div>
+<p class="note">Click a row to set Player A, click another to set Player B. Figures are approximate career totals — verify against ESPNcricinfo before quoting.</p>
+</section>
+
+<section class="panel" style="margin-top:16px" aria-label="Charts">
+<h2>Average vs strike rate</h2>
+<div class="cv" style="height:380px"><canvas id="scatter"></canvas></div>
+<p class="note">Bubble size = number of hundreds. Top-right is the sweet spot: consistent and fast. Shows only players that pass the filters.</p>
+</section>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
