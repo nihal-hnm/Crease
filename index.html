@@ -106,7 +106,21 @@
 
 <section class="panel" aria-label="Player comparison">
 <h2>Head to head</h2>
-<div class="vs"><label><select id="pa" aria-label="Player A"></select></label><span class="x">vs</span><label><select id="pb" aria-label="Player B"></select></label></div>
+<div class="vs">
+  <div class="combo" id="combo-pa">
+    <input type="text" id="pa-input" class="combo-input" placeholder="Search or select Player A..." autocomplete="off" aria-label="Player A">
+    <span class="combo-arrow">▼</span>
+    <div class="combo-menu" id="pa-menu" role="listbox"></div>
+    <select id="pa" style="display:none" aria-hidden="true"></select>
+  </div>
+  <span class="x">vs</span>
+  <div class="combo" id="combo-pb">
+    <input type="text" id="pb-input" class="combo-input" placeholder="Search or select Player B..." autocomplete="off" aria-label="Player B">
+    <span class="combo-arrow">▼</span>
+    <div class="combo-menu" id="pb-menu" role="listbox"></div>
+    <select id="pb" style="display:none" aria-hidden="true"></select>
+  </div>
+</div>
 <div class="verdict" id="verdict"></div>
 <div class="cmp" id="cmp"></div>
 <div class="grid2"><div class="cv"><canvas id="radar"></canvas></div><div class="cv"><canvas id="bar"></canvas></div></div>
