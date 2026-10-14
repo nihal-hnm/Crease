@@ -66,3 +66,76 @@ tr.pa td:first-child{box-shadow:inset 4px 0 var(--a)}tr.pb td:first-child{box-sh
 .social-link:hover svg{color:var(--a);transform:scale(1.08)}
 .footer-copy{font-size:12px;color:var(--mute);text-align:center;padding-top:4px}
 @media(max-width:600px){.footer-content{flex-direction:column;align-items:flex-start}.footer-copy{text-align:left}}
+
+/* ---------- Crease Intro Animation ---------- */
+html.no-intro #crease-intro { display: none !important; }
+#crease-intro { position: fixed; inset: 0; z-index: 99999; background: #0A1712; overflow: hidden; transition: opacity .7s ease; cursor: pointer; }
+#crease-intro.done { opacity: 0; pointer-events: none; }
+#ci-stage { position: absolute; left: 50%; top: 50%; width: 1440px; height: 810px; transform-origin: 0 0; overflow: hidden; background: #0A1712; color: #F3EFE4; font-family: 'Bricolage Grotesque', 'Helvetica Neue', sans-serif; }
+#crease-intro .a { animation-duration: 11s; animation-iteration-count: 1; animation-timing-function: cubic-bezier(.22, .8, .2, 1); animation-fill-mode: both; }
+#crease-intro.loop .a { animation-iteration-count: infinite; }
+#crease-intro .abs { position: absolute; }
+#crease-intro .mask { overflow: hidden; padding-bottom: 6px; }
+#crease-intro .l1 { animation-name: rise1; }
+#crease-intro .l2 { animation-name: rise2; }
+#crease-intro .l3 { animation-name: rise3; }
+@keyframes rise1 { 0%, 11% { transform: translateY(110%); } 18%, 100% { transform: none; } }
+@keyframes rise2 { 0%, 13% { transform: translateY(110%); } 20%, 100% { transform: none; } }
+@keyframes rise3 { 0%, 15% { transform: translateY(110%); } 22%, 100% { transform: none; } }
+#crease-intro .draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation-name: draw; }
+@keyframes draw { 0% { stroke-dashoffset: 1; } 10%, 100% { stroke-dashoffset: 0; } }
+#crease-intro .ball { animation-name: ball; animation-timing-function: ease-in-out !important; }
+@keyframes ball { 0% { transform: translate(40px, 100px); opacity: 0; } 1.5% { opacity: 1; } 7.5% { transform: translate(322px, 738px); } 12% { transform: translate(430px, 630px); } 15.5% { transform: translate(512px, 738px); } 19% { transform: translate(590px, 690px); } 21.5% { transform: translate(660px, 738px); opacity: 1; } 25%, 100% { transform: translate(780px, 738px); opacity: 0; } }
+#crease-intro .ring { animation-name: ring; animation-timing-function: ease-out !important; }
+@keyframes ring { 0%, 7% { transform: scale(.2); opacity: 0; } 7.6% { transform: scale(.2); opacity: .9; } 15%, 100% { transform: scale(1.7); opacity: 0; } }
+#crease-intro .fade { animation-name: introFade; }
+@keyframes introFade { 0%, 19% { opacity: 0; transform: translateY(14px); } 26%, 100% { opacity: 1; transform: none; } }
+#crease-intro .panel { animation-name: introPanel; }
+@keyframes introPanel { 0%, 17% { opacity: 0; transform: translateX(44px); } 25%, 100% { opacity: 1; transform: none; } }
+#crease-intro .axx { transform-origin: 0 50%; animation-name: axx; }
+@keyframes axx { 0%, 21% { transform: scaleX(0); } 28%, 100% { transform: scaleX(1); } }
+#crease-intro .axy { transform-origin: 50% 100%; animation-name: axy; }
+@keyframes axy { 0%, 21% { transform: scaleY(0); } 28%, 100% { transform: scaleY(1); } }
+#crease-intro .b { position: absolute; border-radius: 50%; opacity: .88; }
+#crease-intro .c1 { background: #E04B3A; }
+#crease-intro .c2 { background: #F2B544; }
+#crease-intro .c3 { background: #7BD3A0; }
+#crease-intro .g1 { animation-name: popA; }
+#crease-intro .g2 { animation-name: popB; }
+#crease-intro .g3 { animation-name: popC; }
+#crease-intro .g4 { animation-name: popD; }
+@keyframes popA { 0%, 23% { transform: translate(0, 0) scale(0); } 27% { transform: translate(0, 0) scale(1.2); } 29%, 40% { transform: translate(0, 0) scale(1); } 46%, 52% { transform: translate(var(--dx), var(--dy)) scale(1); } 58%, 100% { transform: translate(var(--ex), var(--ey)) scale(1); } }
+@keyframes popB { 0%, 24.5% { transform: translate(0, 0) scale(0); } 28.5% { transform: translate(0, 0) scale(1.2); } 30.5%, 40% { transform: translate(0, 0) scale(1); } 46%, 52% { transform: translate(var(--dx), var(--dy)) scale(1); } 58%, 100% { transform: translate(var(--ex), var(--ey)) scale(1); } }
+@keyframes popC { 0%, 26% { transform: translate(0, 0) scale(0); } 30% { transform: translate(0, 0) scale(1.2); } 32%, 40% { transform: translate(0, 0) scale(1); } 46%, 52% { transform: translate(var(--dx), var(--dy)) scale(1); } 58%, 100% { transform: translate(var(--ex), var(--ey)) scale(1); } }
+@keyframes popD { 0%, 27.5% { transform: translate(0, 0) scale(0); } 31.5% { transform: translate(0, 0) scale(1.2); } 33.5%, 40% { transform: translate(0, 0) scale(1); } 46%, 52% { transform: translate(var(--dx), var(--dy)) scale(1); } 58%, 100% { transform: translate(var(--ex), var(--ey)) scale(1); } }
+#crease-intro .t1 { animation-name: t1; }
+#crease-intro .t2 { animation-name: t2; }
+#crease-intro .t3 { animation-name: t3; }
+@keyframes t1 { 0%, 27% { background: rgba(243, 239, 228, 0); color: #F3EFE4; } 30%, 42% { background: #F3EFE4; color: #0A1712; } 45%, 100% { background: rgba(243, 239, 228, 0); color: #F3EFE4; } }
+@keyframes t2 { 0%, 42% { background: rgba(243, 239, 228, 0); color: #F3EFE4; } 45%, 53% { background: #F3EFE4; color: #0A1712; } 56%, 100% { background: rgba(243, 239, 228, 0); color: #F3EFE4; } }
+@keyframes t3 { 0%, 53% { background: rgba(243, 239, 228, 0); color: #F3EFE4; } 56%, 100% { background: #F3EFE4; color: #0A1712; } }
+#crease-intro .card { animation-name: introCard; }
+@keyframes introCard { 0%, 54% { opacity: 0; transform: translateY(26px); } 60%, 100% { opacity: 1; transform: none; } }
+#crease-intro .bA { transform-origin: 0 50%; animation-name: bA; }
+#crease-intro .bB { transform-origin: 0 50%; animation-name: bB; }
+@keyframes bA { 0%, 58% { transform: scaleX(0); } 67%, 100% { transform: scaleX(1); } }
+@keyframes bB { 0%, 60% { transform: scaleX(0); } 69%, 100% { transform: scaleX(1); } }
+#crease-intro .sweet { animation-name: sweet; }
+@keyframes sweet { 0%, 62% { opacity: 0; } 68%, 100% { opacity: 1; } }
+#crease-intro .glow { animation-name: glow; animation-timing-function: ease-in-out !important; }
+@keyframes glow { 0%, 62% { opacity: 0; } 70% { opacity: 1; } 76% { opacity: .55; } 100% { opacity: .55; } }
+#crease-intro .over { animation-name: over; }
+@keyframes over { 0%, 72% { opacity: 0; } 78%, 100% { opacity: 1; } }
+#crease-intro .word { animation-name: word; }
+@keyframes word { 0%, 73% { opacity: 0; transform: scale(.92) translateY(10px); } 82%, 100% { opacity: 1; transform: none; } }
+#crease-intro .sub { animation-name: introSub; }
+@keyframes introSub { 0%, 80% { opacity: 0; letter-spacing: .5em; } 87%, 100% { opacity: 1; letter-spacing: .22em; } }
+#crease-intro .pulse { animation-name: pulse; animation-timing-function: ease-in-out !important; }
+@keyframes pulse { 0%, 73% { transform: scale(0); } 80% { transform: scale(1.25); } 83%, 90% { transform: scale(1); } 94% { transform: scale(1.12); } 97%, 100% { transform: scale(1); } }
+#crease-intro:not(.loop) .veil { animation-name: veilIn; }
+#crease-intro.loop .veil { animation-name: veil; }
+#crease-intro .veil { animation-timing-function: ease-in-out !important; }
+@keyframes veilIn { 0% { opacity: 1; } 4%, 100% { opacity: 0; } }
+@keyframes veil { 0% { opacity: 1; } 4%, 96% { opacity: 0; } 100% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { #crease-intro { display: none; } }
+

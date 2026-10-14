@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Crease — Intro</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ---------- Crease intro ----------
+   Plays once (~11s), then fades out and removes itself, revealing your page.
+   Add ?loop to the URL to preview it on repeat.
+   To use it on your site: paste the <style>, the #crease-intro block and the <script> into your page. */
+html,body{margin:0;height:100%;background:#0A1712}
+#crease-intro{position:fixed;inset:0;z-index:99999;background:#0A1712;overflow:hidden;transition:opacity .7s ease}
+#crease-intro.done{opacity:0;pointer-events:none}
+#ci-stage{position:absolute;left:50%;top:50%;width:1440px;height:810px;transform-origin:0 0;overflow:hidden;background:#0A1712;color:#F3EFE4;font-family:'Bricolage Grotesque','Helvetica Neue',sans-serif}
+#crease-intro .a{animation-duration:11s;animation-iteration-count:1;animation-timing-function:cubic-bezier(.22,.8,.2,1);animation-fill-mode:both}
+#crease-intro.loop .a{animation-iteration-count:infinite}
+#crease-intro .abs{position:absolute}
+.mask{overflow:hidden;padding-bottom:6px}
+.l1{animation-name:rise1}.l2{animation-name:rise2}.l3{animation-name:rise3}
+@keyframes rise1{0%,11%{transform:translateY(110%)}18%,100%{transform:none}}
+@keyframes rise2{0%,13%{transform:translateY(110%)}20%,100%{transform:none}}
+@keyframes rise3{0%,15%{transform:translateY(110%)}22%,100%{transform:none}}
+.draw{stroke-dasharray:1;stroke-dashoffset:1;animation-name:draw}
+@keyframes draw{0%{stroke-dashoffset:1}10%,100%{stroke-dashoffset:0}}
+.ball{animation-name:ball;animation-timing-function:ease-in-out!important}
+@keyframes ball{0%{transform:translate(40px,100px);opacity:0}1.5%{opacity:1}7.5%{transform:translate(322px,738px)}12%{transform:translate(430px,630px)}15.5%{transform:translate(512px,738px)}19%{transform:translate(590px,690px)}21.5%{transform:translate(660px,738px);opacity:1}25%,100%{transform:translate(780px,738px);opacity:0}}
+.ring{animation-name:ring;animation-timing-function:ease-out!important}
+@keyframes ring{0%,7%{transform:scale(.2);opacity:0}7.6%{transform:scale(.2);opacity:.9}15%,100%{transform:scale(1.7);opacity:0}}
+.fade{animation-name:fade}
+@keyframes fade{0%,19%{opacity:0;transform:translateY(14px)}26%,100%{opacity:1;transform:none}}
+.panel{animation-name:panel}
+@keyframes panel{0%,17%{opacity:0;transform:translateX(44px)}25%,100%{opacity:1;transform:none}}
+.axx{transform-origin:0 50%;animation-name:axx}
+@keyframes axx{0%,21%{transform:scaleX(0)}28%,100%{transform:scaleX(1)}}
+.axy{transform-origin:50% 100%;animation-name:axy}
+@keyframes axy{0%,21%{transform:scaleY(0)}28%,100%{transform:scaleY(1)}}
+.b{position:absolute;border-radius:50%;opacity:.88}
+.c1{background:#E04B3A}.c2{background:#F2B544}.c3{background:#7BD3A0}
+.g1{animation-name:popA}.g2{animation-name:popB}.g3{animation-name:popC}.g4{animation-name:popD}
+@keyframes popA{0%,23%{transform:translate(0,0) scale(0)}27%{transform:translate(0,0) scale(1.2)}29%,40%{transform:translate(0,0) scale(1)}46%,52%{transform:translate(var(--dx),var(--dy)) scale(1)}58%,100%{transform:translate(var(--ex),var(--ey)) scale(1)}}
+@keyframes popB{0%,24.5%{transform:translate(0,0) scale(0)}28.5%{transform:translate(0,0) scale(1.2)}30.5%,40%{transform:translate(0,0) scale(1)}46%,52%{transform:translate(var(--dx),var(--dy)) scale(1)}58%,100%{transform:translate(var(--ex),var(--ey)) scale(1)}}
+@keyframes popC{0%,26%{transform:translate(0,0) scale(0)}30%{transform:translate(0,0) scale(1.2)}32%,40%{transform:translate(0,0) scale(1)}46%,52%{transform:translate(var(--dx),var(--dy)) scale(1)}58%,100%{transform:translate(var(--ex),var(--ey)) scale(1)}}
+@keyframes popD{0%,27.5%{transform:translate(0,0) scale(0)}31.5%{transform:translate(0,0) scale(1.2)}33.5%,40%{transform:translate(0,0) scale(1)}46%,52%{transform:translate(var(--dx),var(--dy)) scale(1)}58%,100%{transform:translate(var(--ex),var(--ey)) scale(1)}}
+.t1{animation-name:t1}.t2{animation-name:t2}.t3{animation-name:t3}
+@keyframes t1{0%,27%{background:rgba(243,239,228,0);color:#F3EFE4}30%,42%{background:#F3EFE4;color:#0A1712}45%,100%{background:rgba(243,239,228,0);color:#F3EFE4}}
+@keyframes t2{0%,42%{background:rgba(243,239,228,0);color:#F3EFE4}45%,53%{background:#F3EFE4;color:#0A1712}56%,100%{background:rgba(243,239,228,0);color:#F3EFE4}}
+@keyframes t3{0%,53%{background:rgba(243,239,228,0);color:#F3EFE4}56%,100%{background:#F3EFE4;color:#0A1712}}
+.card{animation-name:card}
+@keyframes card{0%,54%{opacity:0;transform:translateY(26px)}60%,100%{opacity:1;transform:none}}
+.bA{transform-origin:0 50%;animation-name:bA}.bB{transform-origin:0 50%;animation-name:bB}
+@keyframes bA{0%,58%{transform:scaleX(0)}67%,100%{transform:scaleX(1)}}
+@keyframes bB{0%,60%{transform:scaleX(0)}69%,100%{transform:scaleX(1)}}
+.sweet{animation-name:sweet}
+@keyframes sweet{0%,62%{opacity:0}68%,100%{opacity:1}}
+.glow{animation-name:glow;animation-timing-function:ease-in-out!important}
+@keyframes glow{0%,62%{opacity:0}70%{opacity:1}76%{opacity:.55}100%{opacity:.55}}
+.over{animation-name:over}
+@keyframes over{0%,72%{opacity:0}78%,100%{opacity:1}}
+.word{animation-name:word}
+@keyframes word{0%,73%{opacity:0;transform:scale(.92) translateY(10px)}82%,100%{opacity:1;transform:none}}
+.sub{animation-name:sub}
+@keyframes sub{0%,80%{opacity:0;letter-spacing:.5em}87%,100%{opacity:1;letter-spacing:.22em}}
+.pulse{animation-name:pulse;animation-timing-function:ease-in-out!important}
+@keyframes pulse{0%,73%{transform:scale(0)}80%{transform:scale(1.25)}83%,90%{transform:scale(1)}94%{transform:scale(1.12)}97%,100%{transform:scale(1)}}
+#crease-intro:not(.loop) .veil{animation-name:veilIn}
+#crease-intro.loop .veil{animation-name:veil}
+.veil{animation-timing-function:ease-in-out!important}
+@keyframes veilIn{0%{opacity:1}4%,100%{opacity:0}}
+@keyframes veil{0%{opacity:1}4%,96%{opacity:0}100%{opacity:1}}
+@media (prefers-reduced-motion:reduce){#crease-intro{display:none}}
+</style>
+</head>
+<body>
+
+<!-- ======= Intro overlay: paste this block just after <body> on your site ======= -->
+<div id="crease-intro" aria-hidden="true">
+<div id="ci-stage">
+
+<svg width="1440" height="810" viewBox="0 0 1440 810" class="abs" style="left:0;top:0" fill="none">
+<path class="a draw" pathLength="1" d="M0 762 H1440" stroke="#F3EFE4" stroke-opacity="0.22" stroke-width="2"/>
+<path class="a draw" pathLength="1" d="M0 792 H1440" stroke="#F3EFE4" stroke-opacity="0.12" stroke-width="2"/>
+<path class="a draw" pathLength="1" d="M200 762 V792 M330 762 V792 M460 762 V792" stroke="#E04B3A" stroke-width="3"/>
+<path class="a draw" pathLength="1" d="M96 90 H1344" stroke="#F3EFE4" stroke-opacity="0.12" stroke-width="1"/>
+</svg>
+
+<div class="abs" style="left:96px;top:52px;display:flex;align-items:center;gap:12px">
+<div style="width:18px;height:18px;border-radius:50%;background:#E04B3A"></div>
+<div style="font-size:26px;font-weight:700">Crease</div>
+</div>
+<div class="a fade abs" style="right:96px;top:58px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;color:rgba(243,239,228,.62)">CRICKET STATS VISUALIZER</div>
+
+<div class="a ring abs" style="left:282px;top:722px;width:80px;height:80px;border-radius:50%;border:2px solid #E04B3A"></div>
+<div class="a ball abs" style="left:0;top:0;width:26px;height:26px;border-radius:50%;background:#E04B3A;box-shadow:0 0 24px rgba(224,75,58,.6)"></div>
+
+<div class="abs" style="left:96px;top:168px;width:680px;font-size:96px;line-height:.98;font-weight:700;letter-spacing:-.02em">
+<div class="mask"><div class="a l1">Settle the</div></div>
+<div class="mask"><div class="a l2">argument with</div></div>
+<div class="mask"><div class="a l3" style="color:#F2B544">the numbers.</div></div>
+</div>
+<div class="a fade abs" style="left:96px;top:486px;width:600px;font-size:22px;line-height:1.4;color:rgba(243,239,228,.72)">Career batting records across three formats, side by side.</div>
+
+<div class="a card abs" style="left:96px;top:574px;width:600px;box-sizing:border-box;padding:18px 22px;border:1px solid rgba(243,239,228,.16);border-radius:14px;background:#10241B;display:flex;flex-direction:column;gap:12px">
+<div style="font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.2em;color:rgba(243,239,228,.62)">HEAD TO HEAD</div>
+<div style="display:flex;align-items:center;gap:16px">
+<div style="width:70px;font-family:'JetBrains Mono',monospace;font-size:13px">Player A</div>
+<div style="flex:1;height:14px;border-radius:7px;background:rgba(243,239,228,.08)"><div class="a bA" style="width:82%;height:14px;border-radius:7px;background:#E04B3A"></div></div>
+</div>
+<div style="display:flex;align-items:center;gap:16px">
+<div style="width:70px;font-family:'JetBrains Mono',monospace;font-size:13px">Player B</div>
+<div style="flex:1;height:14px;border-radius:7px;background:rgba(243,239,228,.08)"><div class="a bB" style="width:66%;height:14px;border-radius:7px;background:#F2B544"></div></div>
+</div>
+</div>
+
+<div class="a panel abs" style="left:800px;top:130px;width:544px;height:500px;box-sizing:border-box;border:1px solid rgba(243,239,228,.16);border-radius:18px;background:#10241B;overflow:hidden">
+<div class="abs" style="left:28px;top:24px;font-size:22px;font-weight:700">Average vs strike rate</div>
+<div class="abs" style="left:28px;top:62px;display:flex;gap:8px;font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.1em">
+<div class="a t1" style="padding:6px 14px;border-radius:999px;border:1px solid rgba(243,239,228,.3)">ODI</div>
+<div class="a t2" style="padding:6px 14px;border-radius:999px;border:1px solid rgba(243,239,228,.3)">TEST</div>
+<div class="a t3" style="padding:6px 14px;border-radius:999px;border:1px solid rgba(243,239,228,.3)">T20I</div>
+</div>
+<div class="a glow abs" style="left:300px;top:100px;width:230px;height:190px;background:radial-gradient(closest-side,rgba(242,181,68,.32),rgba(242,181,68,0))"></div>
+<div class="a axx abs" style="left:56px;top:440px;width:450px;height:2px;background:rgba(243,239,228,.5)"></div>
+<div class="a axy abs" style="left:56px;top:110px;width:2px;height:332px;background:rgba(243,239,228,.5)"></div>
+<div class="a sweet abs" style="left:340px;top:104px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:#F2B544">SWEET SPOT</div>
+<div class="a fade abs" style="left:56px;top:454px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:rgba(243,239,228,.62)">AVERAGE</div>
+<div class="a fade abs" style="left:10px;top:360px;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.14em;color:rgba(243,239,228,.62);transform:rotate(-90deg);transform-origin:0 0">STRIKE RATE</div>
+
+<div class="a b g1 c3" style="left:126px;top:346px;width:28px;height:28px;--dx:40px;--dy:-30px;--ex:-10px;--ey:-64px"></div>
+<div class="a b g2 c1" style="left:180px;top:280px;width:40px;height:40px;--dx:50px;--dy:24px;--ex:90px;--ey:-20px"></div>
+<div class="a b g3 c2" style="left:248px;top:368px;width:24px;height:24px;--dx:-40px;--dy:-50px;--ex:30px;--ey:-90px"></div>
+<div class="a b g4 c1" style="left:282px;top:222px;width:56px;height:56px;--dx:30px;--dy:50px;--ex:-60px;--ey:70px"></div>
+<div class="a b g1 c3" style="left:343px;top:303px;width:34px;height:34px;--dx:-50px;--dy:-40px;--ex:40px;--ey:-70px"></div>
+<div class="a b g2 c1" style="left:368px;top:168px;width:64px;height:64px;--dx:-20px;--dy:60px;--ex:30px;--ey:110px"></div>
+<div class="a b g3 c2" style="left:418px;top:238px;width:44px;height:44px;--dx:-50px;--dy:40px;--ex:-90px;--ey:-20px"></div>
+<div class="a b g4 c3" style="left:195px;top:185px;width:30px;height:30px;--dx:60px;--dy:40px;--ex:130px;--ey:20px"></div>
+<div class="a b g1 c2" style="left:311px;top:151px;width:38px;height:38px;--dx:40px;--dy:36px;--ex:-20px;--ey:90px"></div>
+<div class="a b g2 c3" style="left:447px;top:337px;width:26px;height:26px;--dx:-60px;--dy:-50px;--ex:-120px;--ey:-90px"></div>
+<div class="a b g3 c3" style="left:254px;top:274px;width:32px;height:32px;--dx:20px;--dy:40px;--ex:-40px;--ey:20px"></div>
+<div class="a b g4 c1" style="left:395px;top:125px;width:50px;height:50px;--dx:-40px;--dy:30px;--ex:-70px;--ey:90px"></div>
+</div>
+
+<div class="a over abs" style="left:0;top:0;width:1440px;height:810px;background:#0A1712;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px">
+<div style="display:flex;align-items:center;gap:28px">
+<div class="a pulse" style="width:56px;height:56px;border-radius:50%;background:#E04B3A;box-shadow:0 0 40px rgba(224,75,58,.55)"></div>
+<div class="a word" style="font-size:190px;line-height:1;font-weight:700;letter-spacing:-.03em">Crease</div>
+</div>
+<div class="a sub" style="font-family:'JetBrains Mono',monospace;font-size:16px;color:rgba(243,239,228,.7)">SETTLE THE ARGUMENT WITH THE NUMBERS</div>
+</div>
+
+<div class="a veil abs" style="left:0;top:0;width:1440px;height:810px;background:#0A1712;pointer-events:none"></div>
+</div>
+</div>
+
+<!-- ======= Demo content behind the intro (delete on your site) ======= -->
+<main style="min-height:100vh;display:flex;align-items:center;justify-content:center;color:#F3EFE4;font-family:'Bricolage Grotesque',sans-serif;font-size:32px">Your Crease site appears here</main>
+
+<script>
+(function () {
+  var intro = document.getElementById('crease-intro');
+  var stage = document.getElementById('ci-stage');
+  if (!intro || !stage) return;
+  var loop = /[?&]loop/.test(location.search);
+  if (loop) intro.classList.add('loop');
+
+  // Scale the 1440x810 stage to fit any screen
+  function fit() {
+    var s = Math.min(window.innerWidth / 1440, window.innerHeight / 810);
+    stage.style.transform = 'scale(' + s + ') translate(-50%, -50%)';
+    stage.style.left = '50%';
+    stage.style.top = '50%';
+    stage.style.transformOrigin = '0 0';
+  }
+  fit();
+  window.addEventListener('resize', fit);
+
+  // Skip on click/tap/Escape, and finish automatically after the animation
+  function finish() {
+    intro.classList.add('done');
+    setTimeout(function () { intro.remove(); }, 800);
+  }
+  if (!loop) {
+    var t = setTimeout(finish, 11000);
+    intro.addEventListener('click', function () { clearTimeout(t); finish(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { clearTimeout(t); finish(); } });
+    intro.style.cursor = 'pointer';
+  }
+})();
+</script>
+</body>
+</html>
