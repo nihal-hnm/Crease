@@ -67,6 +67,13 @@ tr.pa td:first-child{box-shadow:inset 4px 0 var(--a)}tr.pb td:first-child{box-sh
 .footer-copy{font-size:12px;color:var(--mute);text-align:center;padding-top:4px}
 @media(max-width:600px){.footer-content{flex-direction:column;align-items:flex-start}.footer-copy{text-align:left}}
 
+/* Live match simulation indicators */
+.live-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#3ec28f;margin-left:6px;vertical-align:middle;box-shadow:0 0 0 0 rgba(62,194,143,.7);animation:livePulse 2s infinite}
+@keyframes livePulse{0%{transform:scale(.95);box-shadow:0 0 0 0 rgba(62,194,143,.7)}70%{transform:scale(1.2);box-shadow:0 0 0 6px rgba(62,194,143,0)}100%{transform:scale(.95);box-shadow:0 0 0 0 rgba(62,194,143,0)}}
+.live-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:#3ec28f;background:rgba(62,194,143,.12);border:1px solid rgba(62,194,143,.3);padding:1px 5px;border-radius:999px;letter-spacing:.04em;margin-left:6px;vertical-align:middle}
+.live-flash{animation:liveFlash 1s ease}
+@keyframes liveFlash{0%{background:rgba(62,194,143,.2)}100%{background:transparent}}
+
 /* ---------- Crease Intro Animation ---------- */
 html.no-intro #crease-intro { display: none !important; }
 #crease-intro { position: fixed; inset: 0; z-index: 99999; background: #0A1712; overflow: hidden; transition: opacity .7s ease; cursor: pointer; }
