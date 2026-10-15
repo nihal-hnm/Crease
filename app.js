@@ -1625,3 +1625,217 @@ function switchH2HTab(tab) {
 initBowlerPair();
 if (comboBPA) comboBPA.sync();
 if (comboBPB) comboBPB.sync();
+
+// ======= RapidAPI Cricbuzz Live Scorecard Integration =======
+// Fetches real live match data and populates the scorecard panel.
+// Falls back to the existing simulation engine transparently.
+
+const RAPID_KEY  = '14cdb2a5f3msh29dcd396889f155p110e86jsnaf85cd2c2f1c';
+const RAPID_HOST = 'cricbuzz-cricket.p.rapidapi.com';
+
+// Map Cricbuzz series type strings → Crease format tokens
+function detectFormat(seriesName = '', matchType = '') {
+  const s = (seriesName + ' ' + matchType).toUpperCase();
+  if (s.includes('T20') || s.includes('TWENTY20')) return 'T20I';
+  if (s.includes('TEST'))                             return 'Test';
+  return 'ODI';
+}
+
+// Convert Cricbuzz innings object into liveMatch structure understood by renderLiveMatch()
+function buildMatchFromCricbuzz(scorecard, matchInfo) {
+  try {
+    const teams   = matchInfo.matchTeamInfo || [];
+    const tA      = (teams[0] && teams[0].battingTeamShortName) || 'TM1';
+    const tB      = (teams[1] && teams[1].battingTeamShortName) || 'TM2';
+    const fmt     = detectFormat(matchInfo.seriesName, matchInfo.matchFormat);
+    const maxOv   = fmt === 'Test' ? 90 : fmt === 'ODI' ? 50 : 20;
+
+    const inn     = scorecard.scoreCard || [];
+    const inn1    = inn[0] || {};
+    const inn2    = inn[1] || {};
+
+    const parseScore = (innObj) => ({
+      runs : (innObj.scoreDetails && innObj.scoreDetails.runs)   || 0,
+      wkts : (innObj.scoreDetails && innObj.scoreDetails.wickets)|| 0,
+      overs: parseFloat((innObj.scoreDetails && innObj.scoreDetails.overs) || 0),
+    });
+
+    const s1 = parseScore(inn1);
+    const s2 = parseScore(inn2);
+
+    const parseBatters = (innObj) =>
+      (innObj.batsmanStriker ? [innObj.batsmanStriker, innObj.batsmanNonStriker] : [])
+        .concat(
+          (innObj.batsmen || []).map(b => ({
+            name     : b.fullName || b.name || '—',
+            runs     : +(b.runs  || 0),
+            balls    : +(b.balls || 0),
+            fours    : +(b.fours || 0),
+            sixes    : +(b.sixes || 0),
+            dismissed: b.outDesc !== undefined && b.outDesc !== '',
+          }))
+        )
+        .filter((v, i, a) => a.findIndex(x => x.name === v.name) === i);
+
+    const parseBowlers = (innObj) =>
+      (innObj.bowlers || []).map(bw => ({
+        name   : bw.fullName || bw.name || '—',
+        overs  : parseFloat(bw.overs  || 0),
+        maidens: +(bw.maidens || 0),
+        runs   : +(bw.runs    || 0),
+        wkts   : +(bw.wickets || 0),
+        balls  : 0,
+      }));
+
+    const parseFow = (innObj) =>
+      (innObj.wickets || []).map((w, i) => ({
+        wkt  : i + 1,
+        runs : +(w.wktRuns || 0),
+        name : w.batsman1 && w.batsman1.name ? w.batsman1.name.split(' ').pop() : '?',
+      }));
+
+    const inplay = (matchInfo.state || '').toLowerCase().includes('inprogress')
+                || (matchInfo.status || '').toLowerCase().includes('live');
+    const phase  = inplay && s2.overs > 0 ? 2 : 1;
+
+    const battersA = parseBatters(inn1);
+    const battersB = parseBatters(inn2);
+
+    const striker1 = inn1.batsmanStriker
+      ? battersA.findIndex(b => b.name === (inn1.batsmanStriker.fullName || inn1.batsmanStriker.name))
+      : 0;
+    const striker2 = inn2.batsmanStriker
+      ? battersB.findIndex(b => b.name === (inn2.batsmanStriker.fullName || inn2.batsmanStriker.name))
+      : 0;
+
+    const activeBowlerRaw =
+      (phase === 1 ? inn1.bowlerStriker : inn2.bowlerStriker) || {};
+
+    return {
+      // identifiers
+      tA, tB, maxOv, fmt,
+      // inn 1
+      runsA : s1.runs,  wktsA : s1.wkts,  oversA : s1.overs,
+      // inn 2
+      runsB : s2.runs,  wktsB : s2.wkts,  oversB : s2.overs,
+      // meta
+      phase,
+      target : phase === 2 ? s1.runs + 1 : 0,
+      battersA,
+      battersB,
+      bowlersB : parseBowlers(inn1),
+      bowlersA : parseBowlers(inn2),
+      fow      : parseFow(phase === 1 ? inn1 : inn2),
+      extras   : (inn1.extrasData && inn1.extrasData.total) || 0,
+      rrHist   : [],
+      lastBall : '—',
+      striker  : phase === 1 ? Math.max(0, striker1) : Math.max(0, striker2),
+      batTeam  : phase === 1 ? tA : tB,
+      bowlTeam : phase === 1 ? tB : tA,
+      activeBowler: {
+        name  : activeBowlerRaw.fullName || activeBowlerRaw.name || '—',
+        overs : parseFloat(activeBowlerRaw.overs  || 0),
+        runs  : +(activeBowlerRaw.runs    || 0),
+        wkts  : +(activeBowlerRaw.wickets || 0),
+        balls : 0,
+        maidens: 0,
+      },
+      // legacy props for renderLiveMatch()
+      bat1: '—', bat1Runs:0, bat1Balls:0,
+      bat2: '—', bat2Runs:0, bat2Balls:0,
+      bowler: activeBowlerRaw.fullName || '—', bowlOvers:0, bowlRuns:0, bowlWkts:0,
+      _fromApi: true,
+    };
+  } catch (e) {
+    console.warn('[Crease] buildMatchFromCricbuzz error:', e);
+    return null;
+  }
+}
+
+// Show/hide a small API-source badge on the live panel header
+function setApiSourceBadge(isLive) {
+  const badge = document.getElementById('live-badge');
+  if (!badge) return;
+  if (isLive) {
+    badge.textContent = 'LIVE · API';
+    badge.style.background = '#e04b3a';
+  } else {
+    badge.textContent = 'SIM';
+    badge.style.background = '#2c5c4a';
+  }
+}
+
+let _apiPollTimer = null;
+
+async function fetchLiveFromApi() {
+  const opts = {
+    method : 'GET',
+    headers: {
+      'x-rapidapi-key' : RAPID_KEY,
+      'x-rapidapi-host': RAPID_HOST,
+    },
+  };
+
+  try {
+    // 1. Get current live matches list
+    const listRes  = await fetch('https://cricbuzz-cricket.p.rapidapi.com/matches/v1/live', opts);
+    if (!listRes.ok) throw new Error(`Matches list HTTP ${listRes.status}`);
+    const listJson = await listRes.json();
+
+    // Flatten all match items from all type groups
+    const allMatches = (listJson.typeMatches || []).flatMap(tg =>
+      (tg.seriesMatches || []).flatMap(sm =>
+        (sm.seriesAdWrapper && sm.seriesAdWrapper.matches) || []
+      )
+    );
+
+    // Prefer international matches (INT series type)
+    const intMatches = allMatches.filter(m =>
+      m.matchInfo && (m.matchInfo.seriesId > 0)
+    );
+    const pick = intMatches[0] || allMatches[0];
+    if (!pick || !pick.matchInfo) {
+      console.info('[Crease] No live matches from API — keeping simulation');
+      setApiSourceBadge(false);
+      return;
+    }
+
+    const matchId = pick.matchInfo.matchId;
+    if (!matchId) { setApiSourceBadge(false); return; }
+
+    // 2. Fetch full scorecard for that match
+    const scRes  = await fetch(
+      `https://cricbuzz-cricket.p.rapidapi.com/mcenter/v1/${matchId}/scard`, opts
+    );
+    if (!scRes.ok) throw new Error(`Scorecard HTTP ${scRes.status}`);
+    const scJson = await scRes.json();
+
+    const built = buildMatchFromCricbuzz(scJson, pick.matchInfo);
+    if (!built) { setApiSourceBadge(false); return; }
+
+    // 3. Inject into the existing render pipeline
+    liveMatch = built;
+    currentScorecardInn = liveMatch.phase;
+    updateInnTabs();
+    renderLiveMatch();
+    setApiSourceBadge(true);
+
+    // Update fixture label with full series name
+    const fixEl = document.getElementById('live-fixture');
+    if (fixEl && pick.matchInfo.seriesName) {
+      fixEl.textContent =
+        `${built.tA} vs ${built.tB} · ${pick.matchInfo.seriesName}`;
+    }
+
+    console.info('[Crease] Live scorecard loaded from API — match', matchId);
+  } catch (err) {
+    console.warn('[Crease] API fetch failed, simulation active:', err.message);
+    setApiSourceBadge(false);
+  }
+}
+
+// Kick off: try API immediately, then re-poll every 60 s
+(function startApiPolling() {
+  fetchLiveFromApi();
+  _apiPollTimer = setInterval(fetchLiveFromApi, 60_000);
+})();
