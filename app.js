@@ -830,3 +830,798 @@ function simulateLiveBall() {
 setInterval(simulateLiveBall, 3500);
 
 draw();
+
+// ======= Bowler Datasets =======
+const BOWL_ODI = [
+  ["Wasim Akram","PAK",356,502,23.5,3.89,5,15,6],
+  ["Waqar Younis","PAK",262,416,24.0,4.68,7,36,13],
+  ["Muttiah Muralitharan","SL",350,534,23.1,3.93,7,30,10],
+  ["Chaminda Vaas","SL",322,400,27.1,4.18,8,19,4],
+  ["Javagal Srinath","IND",229,315,28.1,4.44,5,23,3],
+  ["Shane Warne","AUS",194,293,25.8,4.25,5,33,1],
+  ["Allan Donald","SA",164,272,21.9,3.53,6,23,2],
+  ["Brett Lee","AUS",221,380,23.4,4.76,5,22,9],
+  ["Anil Kumble","IND",271,337,30.9,4.30,6,12,2],
+  ["Glenn McGrath","AUS",250,381,22.0,3.88,7,15,7],
+  ["James Anderson","ENG",194,269,29.2,4.83,5,23,2],
+  ["Zaheer Khan","IND",200,282,29.4,4.69,5,42,5],
+  ["Shaun Pollock","SA",303,393,24.5,3.67,6,35,6],
+  ["Imran Khan","PAK",175,182,26.6,3.89,6,14,1],
+  ["Kapil Dev","IND",225,253,27.5,3.71,5,43,1],
+  ["Courtney Walsh","WI",205,227,30.5,3.94,5,1,1],
+  ["Curtly Ambrose","WI",176,225,24.1,3.48,5,17,2],
+  ["Mitchell Starc","AUS",127,227,22.2,4.61,6,43,6],
+  ["Trent Boult","NZ",107,169,25.1,4.72,7,34,3],
+  ["Rashid Khan","AFG",105,176,16.8,3.94,7,18,5],
+  ["Jasprit Bumrah","IND",87,149,24.4,4.63,5,27,3],
+  ["Kagiso Rabada","SA",95,152,26.8,5.20,5,34,2],
+  ["Josh Hazlewood","AUS",100,145,26.4,4.74,5,35,1],
+  ["Mohammad Shami","IND",97,149,27.2,5.17,5,69,2],
+  ["Ravichandran Ashwin","IND",116,150,33.4,4.89,4,25,0],
+  ["Shakib Al Hasan","BAN",247,299,29.5,4.61,5,29,6],
+  ["Harbhajan Singh","IND",236,269,33.7,4.29,5,29,2],
+  ["Saqlain Mushtaq","PAK",169,288,21.8,3.64,5,20,11],
+  ["Shahid Afridi","PAK",398,395,34.5,4.62,7,12,9],
+  ["Daniel Vettori","NZ",295,305,30.4,3.99,5,7,2],
+  ["Tim Southee","NZ",149,203,29.4,5.26,7,33,5],
+  ["Pat Cummins","AUS",97,139,27.0,5.22,5,70,1],
+  ["Mustafizur Rahman","BAN",98,127,30.4,5.27,5,50,2],
+  ["Lockie Ferguson","NZ",64,112,26.5,5.62,5,45,1],
+  ["Lance Klusener","SA",171,192,29.8,3.85,6,49,5],
+  ["Dwayne Bravo","WI",164,199,33.4,5.17,6,28,2],
+];
+const BOWL_TEST = [
+  ["Muttiah Muralitharan","SL",133,800,22.7,2.47,9,51,67],
+  ["Shane Warne","AUS",145,708,25.4,2.65,8,71,37],
+  ["James Anderson","ENG",188,695,26.4,2.88,7,42,32],
+  ["Anil Kumble","IND",132,619,29.7,2.69,10,74,35],
+  ["Glenn McGrath","AUS",124,563,21.6,2.49,8,24,29],
+  ["Courtney Walsh","WI",132,519,24.4,2.65,7,37,22],
+  ["Curtly Ambrose","WI",98,405,20.9,2.30,8,45,22],
+  ["Ian Botham","ENG",102,383,28.4,3.03,8,34,27],
+  ["Richard Hadlee","NZ",86,431,22.3,2.63,9,52,36],
+  ["Kapil Dev","IND",131,434,29.6,2.87,9,83,23],
+  ["Nathan Lyon","AUS",127,435,32.0,2.88,8,50,16],
+  ["Ravichandran Ashwin","IND",105,500,24.0,2.83,9,72,37],
+  ["Ravindra Jadeja","IND",77,280,24.5,2.54,7,42,10],
+  ["Wasim Akram","PAK",104,414,23.6,2.77,7,119,25],
+  ["Waqar Younis","PAK",87,373,23.6,3.54,7,76,22],
+  ["Dale Steyn","SA",93,439,22.9,3.05,7,51,26],
+  ["Kagiso Rabada","SA",58,273,22.3,3.15,7,112,12],
+  ["Mitchell Starc","AUS",72,300,26.4,3.34,6,66,14],
+  ["Pat Cummins","AUS",65,247,21.9,2.98,7,23,8],
+  ["Stuart Broad","ENG",167,604,27.7,2.99,8,15,20],
+  ["Shaun Pollock","SA",108,421,23.1,2.66,7,87,16],
+  ["Harbhajan Singh","IND",103,417,32.5,3.32,8,84,25],
+  ["Kemar Roach","WI",83,266,27.2,2.87,6,48,6],
+  ["Tim Southee","NZ",100,355,29.5,3.36,7,64,12],
+  ["Josh Hazlewood","AUS",61,223,27.6,3.03,6,67,7],
+  ["Jasprit Bumrah","IND",43,182,18.9,2.39,6,27,9],
+  ["Ben Stokes","ENG",105,195,32.5,3.21,6,22,4],
+  ["Shakib Al Hasan","BAN",68,242,31.2,2.86,7,36,14],
+  ["Imran Khan","PAK",88,362,22.8,2.54,8,58,23],
+  ["Zaheer Khan","IND",92,311,32.9,3.13,7,87,11],
+  ["Malcolm Marshall","WI",81,376,20.9,2.69,7,53,22],
+  ["Bob Willis","ENG",90,325,25.2,3.12,8,43,16],
+];
+const BOWL_T20 = [
+  ["Rashid Khan","AFG",93,144,13.7,6.44,5,3,1],
+  ["Shakib Al Hasan","BAN",129,130,21.0,6.92,4,9,0],
+  ["Tim Southee","NZ",116,136,22.0,7.61,5,18,3],
+  ["Lasith Malinga","SL",84,107,20.0,7.14,5,31,2],
+  ["Shadab Khan","PAK",104,124,22.2,7.19,4,24,0],
+  ["Jasprit Bumrah","IND",72,89,22.4,6.24,3,21,0],
+  ["Samuel Badree","WI",59,68,14.8,5.47,4,17,0],
+  ["Mitchell Starc","AUS",60,77,20.2,7.11,4,8,0],
+  ["Trent Boult","NZ",66,84,19.9,7.20,4,21,0],
+  ["Adil Rashid","ENG",84,93,22.7,7.28,4,2,0],
+  ["Kagiso Rabada","SA",61,81,19.5,7.51,4,21,0],
+  ["Dwayne Bravo","WI",91,78,28.2,8.00,4,38,0],
+  ["Mohammad Nabi","AFG",129,92,24.6,6.75,4,11,0],
+  ["Pat Cummins","AUS",63,84,21.8,8.24,4,32,0],
+  ["Sikandar Raza","ZIM",91,82,22.4,7.32,4,9,0],
+  ["Mujeeb ur Rahman","AFG",77,98,18.6,6.61,5,20,1],
+  ["Wanindu Hasaranga","SL",77,99,18.4,6.81,6,35,3],
+  ["Ish Sodhi","NZ",66,79,22.6,7.76,4,19,0],
+  ["Imad Wasim","PAK",85,93,24.1,6.89,4,21,0],
+  ["Stuart Broad","ENG",56,65,24.0,7.49,3,10,0],
+];
+
+const mkBowlD = a => a.map(r => ({name:r[0],team:r[1],m:r[2],wkts:r[3],bavg:r[4],eco:r[5],bestW:r[6],bestR:r[7],fiver:r[8]}));
+const BOWL_SETS = {ODI:mkBowlD(BOWL_ODI),Test:mkBowlD(BOWL_TEST),T20I:mkBowlD(BOWL_T20)};
+let BD = BOWL_SETS.ODI;
+const BCOLS = [["name","Player"],["team","Team"],["m","Mat"],["wkts","Wkts"],["bavg","Avg"],["eco","Econ"],["bestW","Best"],["fiver","5W"]];
+let bsk = "wkts", bsd = -1;
+
+function fillBowlSelect() {
+  const tb = document.getElementById("teamb"); if (!tb) return;
+  tb.innerHTML = '<option value="">All teams</option>';
+  [...new Set(BD.map(p=>p.team))].sort().forEach(t=>{const o=document.createElement("option");o.value=o.textContent=t;tb.append(o);});
+}
+fillBowlSelect();
+
+function filteredBowl() {
+  const q=(document.getElementById("qb")?document.getElementById("qb").value:"").trim().toLowerCase();
+  const t=document.getElementById("teamb")?document.getElementById("teamb").value:"";
+  const w=+(document.getElementById("wk")?document.getElementById("wk").value:0);
+  return BD.filter(p=>p.name.toLowerCase().includes(q)&&(!t||p.team===t)&&p.wkts>=w)
+    .sort((x,y)=>(x[bsk]>y[bsk]?1:-1)*bsd);
+}
+
+function drawBowlerTable() {
+  const thb=document.getElementById("thb"); if(!thb) return;
+  thb.innerHTML=BCOLS.map(c=>`<th data-bk="${c[0]}" class="${c[0]===bsk?"s":""}">${c[1]}${c[0]===bsk?(bsd>0?" \u25b2":" \u25bc"):""}</th>`).join("");
+  thb.onclick=e=>{const k=e.target.dataset.bk;if(!k)return;bsd=bsk===k?-bsd:(k==="name"||k==="team"?1:-1);bsk=k;drawBowlerTable();};
+  const f=filteredBowl();
+  document.getElementById("tbb").innerHTML=f.length
+    ?f.map(p=>`<tr tabindex="0"><td>${p.name}</td><td><span class="tag">${p.team}</span></td><td>${p.m}</td><td>${p.wkts}</td><td>${p.bavg.toFixed(1)}</td><td>${p.eco.toFixed(2)}</td><td>${p.bestW}/${p.bestR}</td><td>${p.fiver}</td></tr>`).join("")
+    :`<tr><td colspan="8" class="empty">No bowlers match. Reset filters.</td></tr>`;
+}
+drawBowlerTable();
+
+(function(){
+  const qb=document.getElementById("qb"); if(qb) qb.oninput=()=>drawBowlerTable();
+  const teamb=document.getElementById("teamb"); if(teamb) teamb.oninput=()=>drawBowlerTable();
+  const wk=document.getElementById("wk"); if(wk) wk.oninput=()=>{document.getElementById("wkv").textContent=wk.value;drawBowlerTable();};
+  const eco=document.getElementById("eco"); if(eco) eco.oninput=()=>{document.getElementById("ecov").textContent=parseFloat(eco.value).toFixed(1);drawBowlerTable();};
+  const resetb=document.getElementById("resetb"); if(resetb) resetb.onclick=()=>{
+    if(qb)qb.value=""; if(teamb)teamb.value="";
+    if(wk){wk.value=0;document.getElementById("wkv").textContent="0";}
+    if(eco){eco.value=0;document.getElementById("ecov").textContent="0.0";}
+    drawBowlerTable();
+  };
+})();
+
+// Batsmen / Bowlers switch bar
+let playerTab = "bat";
+function switchPlayerTab(tab) {
+  playerTab = tab;
+  const batSec=document.getElementById("bat-section"),bowlSec=document.getElementById("bowl-section");
+  const ptsBat=document.getElementById("pts-bat"),ptsBowl=document.getElementById("pts-bowl");
+  if(tab==="bat"){
+    if(batSec)batSec.style.display=""; if(bowlSec)bowlSec.style.display="none";
+    if(ptsBat)ptsBat.classList.add("active"); if(ptsBowl)ptsBowl.classList.remove("active");
+  } else {
+    if(batSec)batSec.style.display="none"; if(bowlSec)bowlSec.style.display="";
+    if(ptsBat)ptsBat.classList.remove("active"); if(ptsBowl)ptsBowl.classList.add("active");
+    BD=BOWL_SETS[FMT]; fillBowlSelect(); drawBowlerTable();
+  }
+}
+(function(){
+  const pb=document.getElementById("pts-bat"); if(pb) pb.onclick=()=>switchPlayerTab("bat");
+  const pw=document.getElementById("pts-bowl"); if(pw) pw.onclick=()=>switchPlayerTab("bowl");
+  const fmtEl=document.getElementById("fmt");
+  if(fmtEl) fmtEl.addEventListener("click",()=>setTimeout(()=>{BD=BOWL_SETS[FMT];if(playerTab==="bowl"){fillBowlSelect();drawBowlerTable();}},60));
+})();
+
+// ======= Live Match Panel Simulation =======
+const MT=["IND","AUS","ENG","PAK","SA","NZ","SL","WI","BAN","AFG"];
+const BAT_POOL={
+  IND:["Rohit Sharma","Virat Kohli","Shubman Gill","KL Rahul","Rishabh Pant","Hardik Pandya","Yashasvi Jaiswal"],
+  AUS:["David Warner","Travis Head","Steve Smith","Marnus Labuschagne","Glenn Maxwell","Pat Cummins","Matthew Wade"],
+  ENG:["Joe Root","Ben Stokes","Jos Buttler","Jonny Bairstow","Jason Roy","Moeen Ali","Dawid Malan"],
+  PAK:["Babar Azam","Mohammad Rizwan","Fakhar Zaman","Iftikhar Ahmed","Salman Agha","Shadab Khan","Abdullah Shafique"],
+  SA:["Quinton de Kock","David Miller","Heinrich Klaasen","Aiden Markram","Rassie van der Dussen","Marco Jansen","Temba Bavuma"],
+  NZ:["Kane Williamson","Devon Conway","Glenn Phillips","Daryl Mitchell","Mark Chapman","Mitchell Santner","Tom Latham"],
+  SL:["Pathum Nissanka","Kusal Mendis","Charith Asalanka","Dasun Shanaka","Wanindu Hasaranga","Sadeera Samarawickrama","Dhananjaya de Silva"],
+  WI:["Nicholas Pooran","Shai Hope","Evin Lewis","Andre Russell","Shimron Hetmyer","Jason Holder","Romario Shepherd"],
+  BAN:["Shakib Al Hasan","Mushfiqur Rahim","Tamim Iqbal","Mahmudullah","Litton Das","Towhid Hridoy","Najmul Hossain"],
+  AFG:["Rashid Khan","Mohammad Nabi","Rahmanullah Gurbaz","Ibrahim Zadran","Najibullah Zadran","Ikram Alikhil","Azmatullah Omarzai"]
+};
+const BOWL_POOL_LM={
+  IND:["Jasprit Bumrah","Mohammad Shami","Ravindra Jadeja","Ravichandran Ashwin","Hardik Pandya"],
+  AUS:["Pat Cummins","Mitchell Starc","Josh Hazlewood","Glenn Maxwell","Adam Zampa"],
+  ENG:["James Anderson","Stuart Broad","Ben Stokes","Mark Wood","Adil Rashid"],
+  PAK:["Shaheen Afridi","Haris Rauf","Naseem Shah","Shadab Khan","Wahab Riaz"],
+  SA:["Kagiso Rabada","Anrich Nortje","Lungi Ngidi","Keshav Maharaj","Wayne Parnell"],
+  NZ:["Tim Southee","Trent Boult","Matt Henry","Ish Sodhi","Mitchell Santner"],
+  SL:["Wanindu Hasaranga","Maheesh Theekshana","Dushmantha Chameera","Kasun Rajitha","Akila Dananjaya"],
+  WI:["Alzarri Joseph","Jason Holder","Hayden Walsh","Andre Russell","Kemar Roach"],
+  BAN:["Taskin Ahmed","Mustafizur Rahman","Shakib Al Hasan","Mehidy Hasan","Shoriful Islam"],
+  AFG:["Rashid Khan","Mujeeb ur Rahman","Naveen-ul-Haq","Fazalhaq Farooqi","Qais Ahmad"]
+};
+let liveMatch=null;
+const ri=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pr=arr=>arr[ri(0,arr.length-1)];
+
+function mkBatter(name){return {name,runs:0,balls:0,fours:0,sixes:0,dismissed:false};}
+function mkBowler(name){return {name,overs:0,balls:0,runs:0,wkts:0,maidens:0};}
+
+function seedBatters(pool){
+  const used=[],batters=[];
+  for(let i=0;i<Math.min(6,pool.length);i++){
+    let n;do{n=pr(pool);}while(used.includes(n));
+    used.push(n);
+    const b=mkBatter(n);
+    b.runs=ri(0,72);b.balls=ri(b.runs,b.runs+30);b.fours=ri(0,Math.floor(b.runs/6));b.sixes=ri(0,Math.floor(b.runs/12));b.dismissed=true;
+    batters.push(b);
+  }
+  return batters;
+}
+function seedBowlers(pool){
+  const used=[],bowlers=[];
+  for(let i=0;i<Math.min(4,pool.length);i++){
+    let n;do{n=pr(pool);}while(used.includes(n));
+    used.push(n);
+    const bw=mkBowler(n);
+    bw.overs=ri(2,8);bw.balls=bw.overs*6;bw.runs=ri(bw.overs*4,bw.overs*8);bw.wkts=ri(0,2);
+    bowlers.push(bw);
+  }
+  return bowlers;
+}
+
+function initLiveMatch(){
+  let ti=ri(0,MT.length-1),tj;do{tj=ri(0,MT.length-1);}while(tj===ti);
+  const tA=MT[ti],tB=MT[tj];
+  const maxOv=FMT==="Test"?90:FMT==="ODI"?50:20;
+  const isChase=Math.random()>0.5;
+  const batsA=BAT_POOL[tA]||["Opener A","Opener B"],batsB=BAT_POOL[tB]||["Opener C","Opener D"];
+  const bowlsB=BOWL_POOL_LM[tB]||["Bowler"],bowlsA=BOWL_POOL_LM[tA]||["Bowler"];
+
+  if(!isChase){
+    const r=ri(30,110),w=ri(2,5),ov=parseFloat((ri(10,Math.floor(maxOv*0.55))+Math.random()*0.4).toFixed(1));
+    const dBats=seedBatters(batsA);
+    const remPool=batsA.filter(x=>!dBats.find(b=>b.name===x));
+    const b1=mkBatter(pr(remPool.length?remPool:batsA));
+    const b2=mkBatter(pr(remPool.filter(x=>x!==b1.name).length?remPool.filter(x=>x!==b1.name):batsA));
+    b1.runs=ri(0,55);b1.balls=ri(b1.runs,b1.runs+30);b1.fours=ri(0,Math.floor(b1.runs/6));b1.sixes=ri(0,Math.floor(b1.runs/12));
+    b2.runs=ri(0,40);b2.balls=ri(b2.runs,b2.runs+25);b2.fours=ri(0,Math.floor(b2.runs/6));b2.sixes=ri(0,Math.floor(b2.runs/12));
+    const dBowl=seedBowlers(bowlsB);
+    const abw=mkBowler(pr(bowlsB.filter(x=>!dBowl.find(b=>b.name===x)).length?bowlsB.filter(x=>!dBowl.find(b=>b.name===x)):bowlsB));
+    abw.overs=ri(0,3);abw.balls=abw.overs*6;abw.runs=ri(0,28);abw.wkts=ri(0,2);
+    const fow=dBats.map((bt,i)=>({wkt:i+1,runs:ri(Math.max(1,10*(i+1)-5),Math.max(10*(i+1)+10,r-5)),name:bt.name})).sort((a,b2)=>a.runs-b2.runs);
+    const rrHist=[];const numSeg=Math.max(1,Math.floor(ov/5));
+    for(let i=0;i<numSeg;i++)rrHist.push(parseFloat((ri(4,10)+Math.random()).toFixed(1)));
+    liveMatch={tA,tB,maxOv,phase:1,runsA:r,wktsA:w,oversA:ov,runsB:0,wktsB:0,oversB:0,target:0,
+      battersA:[...dBats,b1,b2],striker:dBats.length,
+      bowlersB:dBowl,activeBowler:abw,bowlTeam:tB,batTeam:tA,
+      fow,extras:ri(4,14),rrHist,lastBall:"\u2014",
+      bat1:b1.name,bat2:b2.name,bat1Runs:b1.runs,bat1Balls:b1.balls,bat2Runs:b2.runs,bat2Balls:b2.balls,
+      bowler:abw.name,bowlOvers:abw.overs,bowlRuns:abw.runs,bowlWkts:abw.wkts};
+  } else {
+    const tgt=ri(140,290),rb=ri(20,Math.min(tgt-2,120)),wb=ri(0,5),ovb=parseFloat((ri(6,Math.floor(maxOv*0.65))+Math.random()*0.4).toFixed(1));
+    const dBatsB=seedBatters(batsB);
+    const remPool=batsB.filter(x=>!dBatsB.find(b=>b.name===x));
+    const b1=mkBatter(pr(remPool.length?remPool:batsB));
+    const b2=mkBatter(pr(remPool.filter(x=>x!==b1.name).length?remPool.filter(x=>x!==b1.name):batsB));
+    b1.runs=ri(0,65);b1.balls=ri(b1.runs,b1.runs+35);b1.fours=ri(0,Math.floor(b1.runs/6));b1.sixes=ri(0,Math.floor(b1.runs/12));
+    b2.runs=ri(0,45);b2.balls=ri(b2.runs,b2.runs+28);b2.fours=ri(0,Math.floor(b2.runs/6));b2.sixes=ri(0,Math.floor(b2.runs/12));
+    const dBowl=seedBowlers(bowlsA);
+    const abw=mkBowler(pr(bowlsA.filter(x=>!dBowl.find(b=>b.name===x)).length?bowlsA.filter(x=>!dBowl.find(b=>b.name===x)):bowlsA));
+    abw.overs=ri(0,3);abw.balls=abw.overs*6;abw.runs=ri(0,32);abw.wkts=ri(0,2);
+    const fow=dBatsB.map((bt,i)=>({wkt:i+1,runs:ri(Math.max(1,5*(i+1)-3),Math.max(5*(i+1)+10,rb-3)),name:bt.name})).sort((a,b2)=>a.runs-b2.runs);
+    const rrHist=[];const numSeg=Math.max(1,Math.floor(ovb/5));
+    for(let i=0;i<numSeg;i++)rrHist.push(parseFloat((ri(5,13)+Math.random()).toFixed(1)));
+    liveMatch={tA,tB,maxOv,phase:2,runsA:tgt-1,wktsA:10,oversA:maxOv,runsB:rb,wktsB:wb,oversB:ovb,target:tgt,
+      battersB:[...dBatsB,b1,b2],striker:dBatsB.length,
+      bowlersA:dBowl,activeBowler:abw,bowlTeam:tA,batTeam:tB,
+      fow,extras:ri(2,10),rrHist,lastBall:"\u2014",
+      bat1:b1.name,bat2:b2.name,bat1Runs:b1.runs,bat1Balls:b1.balls,bat2Runs:b2.runs,bat2Balls:b2.balls,
+      bowler:abw.name,bowlOvers:abw.overs,bowlRuns:abw.runs,bowlWkts:abw.wkts};
+  }
+  currentScorecardInn=liveMatch.phase;
+  updateInnTabs();
+}
+
+let currentScorecardInn=1;
+function updateInnTabs(){
+  const t1=document.getElementById("sc-tab-1"),t2=document.getElementById("sc-tab-2");
+  if(t1)t1.classList.toggle("active",currentScorecardInn===1);
+  if(t2)t2.classList.toggle("active",currentScorecardInn===2);
+}
+(function(){
+  const tabs=document.getElementById("sc-innings-tabs");
+  if(tabs)tabs.addEventListener("click",e=>{
+    const btn=e.target.closest(".sc-inn-tab");
+    if(!btn)return;
+    currentScorecardInn=+btn.dataset.inn;
+    updateInnTabs();
+    renderLiveMatch();
+  });
+})();
+
+function tickLiveMatch(){
+  if(!liveMatch){initLiveMatch();renderLiveMatch();return;}
+  const m=liveMatch,roll=Math.random();
+  let dr=0,isWkt=false;
+  if(roll<0.26)dr=0;else if(roll<0.53)dr=1;else if(roll<0.67)dr=2;else if(roll<0.81)dr=4;else if(roll<0.91)dr=6;else isWkt=true;
+  m.lastBall=isWkt?"W":String(dr);
+  const batsTeam=m.phase===1?m.tA:m.tB;
+  const bBag=BAT_POOL[batsTeam]||["Batter"];
+  const batters=m.phase===1?(m.battersA=m.battersA||[]):(m.battersB=m.battersB||[]);
+  const s=m.striker;
+  m.activeBowler.runs+=dr;
+
+  if(isWkt){
+    if(m.phase===1){
+      m.wktsA++;m.activeBowler.wkts++;
+      if(batters[s])batters[s].dismissed=true;
+      m.fow=m.fow||[];m.fow.push({wkt:m.wktsA,runs:m.runsA,name:batters[s]?batters[s].name:"?"});
+      if(m.wktsA>=10){
+        m.phase=2;m.runsB=0;m.wktsB=0;m.oversB=0;m.target=m.runsA+1;
+        const nb=mkBatter(pr(BAT_POOL[m.tB]||["Batter"]));
+        const nb2=mkBatter(pr((BAT_POOL[m.tB]||["Batter"]).filter(x=>x!==nb.name)||[nb.name]));
+        m.battersB=[nb,nb2];m.bowlersA=[];m.striker=0;m.batTeam=m.tB;m.bowlTeam=m.tA;
+        m.activeBowler=mkBowler(pr(BOWL_POOL_LM[m.tA]||["Bowler"]));m.rrHist=[];
+        currentScorecardInn=2;updateInnTabs();
+      } else {
+        const nb=mkBatter(pr(bBag.filter(x=>!batters.find(b=>b.name===x)).length?bBag.filter(x=>!batters.find(b=>b.name===x)):bBag));
+        batters.push(nb);m.striker=batters.length-1;
+      }
+    } else {
+      m.wktsB++;m.activeBowler.wkts++;
+      if(batters[s])batters[s].dismissed=true;
+      m.fow=m.fow||[];m.fow.push({wkt:m.wktsB,runs:m.runsB,name:batters[s]?batters[s].name:"?"});
+      if(m.wktsB>=10){initLiveMatch();renderLiveMatch();return;}
+      const nb=mkBatter(pr(bBag.filter(x=>!batters.find(b=>b.name===x)).length?bBag.filter(x=>!batters.find(b=>b.name===x)):bBag));
+      batters.push(nb);m.striker=batters.length-1;
+    }
+  } else {
+    if(m.phase===1)m.runsA+=dr;else m.runsB+=dr;
+    if(batters[s]){batters[s].runs+=dr;batters[s].balls++;if(dr===4)batters[s].fours++;if(dr===6)batters[s].sixes++;}
+    if(dr%2===1)m.striker=1-m.striker;
+  }
+
+  const ovKey=m.phase===1?"oversA":"oversB";
+  let balls=Math.round((m[ovKey]%1)*10)+1;
+  m.activeBowler.balls++;
+  if(balls>=6){
+    m[ovKey]=Math.floor(m[ovKey])+1;
+    m.activeBowler.overs=Math.floor(m.activeBowler.overs)+1;
+    const bowlerList=m.phase===1?(m.bowlersB=m.bowlersB||[]):(m.bowlersA=m.bowlersA||[]);
+    const ex=bowlerList.find(b=>b.name===m.activeBowler.name);
+    if(ex){ex.overs=m.activeBowler.overs;ex.runs=m.activeBowler.runs;ex.wkts=m.activeBowler.wkts;ex.balls=m.activeBowler.balls;}
+    else bowlerList.push({...m.activeBowler});
+    m.rrHist=m.rrHist||[];
+    const curR=m.phase===1?m.runsA:m.runsB,curOv=m[ovKey];
+    if(curOv>0)m.rrHist.push(parseFloat((curR/curOv).toFixed(1)));
+    const newBowlerPool=(m.phase===1?BOWL_POOL_LM[m.tB]:BOWL_POOL_LM[m.tA])||["Bowler"];
+    const nb=pr(newBowlerPool.filter(x=>x!==m.activeBowler.name).length?newBowlerPool.filter(x=>x!==m.activeBowler.name):newBowlerPool);
+    m.activeBowler=mkBowler(nb);
+  } else {
+    m[ovKey]=parseFloat((Math.floor(m[ovKey])+balls/10).toFixed(1));
+  }
+  if(m[ovKey]>=m.maxOv){
+    if(m.phase===1){
+      m.phase=2;m.runsB=0;m.wktsB=0;m.oversB=0;m.target=m.runsA+1;
+      const nb=mkBatter(pr(BAT_POOL[m.tB]||["Batter"]));
+      const nb2=mkBatter(pr((BAT_POOL[m.tB]||["Batter"]).filter(x=>x!==nb.name)||[nb.name]));
+      m.battersB=[nb,nb2];m.bowlersA=[];m.striker=0;m.batTeam=m.tB;m.bowlTeam=m.tA;
+      m.activeBowler=mkBowler(pr(BOWL_POOL_LM[m.tA]||["Bowler"]));m.rrHist=[];
+      currentScorecardInn=2;updateInnTabs();
+    } else {initLiveMatch();renderLiveMatch();return;}
+  }
+  if(m.phase===2&&m.runsB>=m.target){setTimeout(()=>{initLiveMatch();renderLiveMatch();},1500);return;}
+
+  const activeBats=m.phase===1?m.battersA:m.battersB;
+  const ab1=activeBats&&activeBats[m.striker];
+  const ab2=activeBats&&activeBats[m.striker===0?1:(m.striker>0?m.striker-1:0)];
+  m.bat1=ab1?ab1.name:"\u2014";m.bat1Runs=ab1?ab1.runs:0;m.bat1Balls=ab1?ab1.balls:0;
+  m.bat2=ab2?ab2.name:"\u2014";m.bat2Runs=ab2?ab2.runs:0;m.bat2Balls=ab2?ab2.balls:0;
+  m.bowler=m.activeBowler.name;m.bowlOvers=m.activeBowler.overs;m.bowlRuns=m.activeBowler.runs;m.bowlWkts=m.activeBowler.wkts;
+  renderLiveMatch();
+}
+
+function renderLiveMatch(){
+  if(!liveMatch)return;
+  const m=liveMatch,inn=currentScorecardInn,isChase=m.phase===2;
+  const set=(id,txt)=>{const e=document.getElementById(id);if(e)e.textContent=txt;};
+
+  // Summary bar
+  set("live-fixture",`${m.tA} vs ${m.tB} \u2022 ${FMT}`);
+  set("sc-sum-team-a",m.tA);set("sc-sum-score-a",`${m.runsA}/${m.wktsA}`);set("sc-sum-overs-a",`${m.oversA} ov`);
+  set("sc-sum-team-b",m.tB);
+  if(isChase){set("sc-sum-score-b",`${m.runsB}/${m.wktsB}`);set("sc-sum-overs-b",`${m.oversB} ov`);}
+  else{set("sc-sum-score-b","Yet to bat");set("sc-sum-overs-b","");}
+
+  const saEl=document.getElementById("sc-sum-score-a"),sbEl=document.getElementById("sc-sum-score-b");
+  if(saEl)saEl.className="sc-team-score"+(m.phase===1?" batting":"");
+  if(sbEl)sbEl.className="sc-team-score"+(m.phase===2?" batting":"");
+
+  const curR=isChase?m.runsB:m.runsA,curOv=isChase?m.oversB:m.oversA;
+  set("live-crr",curOv>0?(curR/curOv).toFixed(2):"0.00");
+  const rrrBlock=document.getElementById("sc-rrr-block");
+  if(isChase&&m.target){
+    const needed=m.target-m.runsB,bl=Math.max(1,Math.round((m.maxOv-m.oversB)*6));
+    set("live-rrr",((needed/bl)*6).toFixed(2));
+    if(rrrBlock)rrrBlock.style.display="";
+  } else {if(rrrBlock)rrrBlock.style.display="none";}
+
+  const lb=document.getElementById("live-last-ball");
+  if(lb){lb.textContent=m.lastBall;lb.className="live-last-ball"+(m.lastBall==="6"?" six":m.lastBall==="4"?" four":m.lastBall==="W"?" wicket":"");}
+
+  const showInn1=inn===1;
+  const batters=showInn1?(m.battersA||[]):(m.battersB||[]);
+  const bowlers=showInn1?(m.bowlersB||[]):(m.bowlersA||[]);
+  const strikerIdx=(showInn1&&m.phase===1)||((!showInn1)&&m.phase===2)?m.striker:-1;
+  const activeBowlerName=((showInn1&&m.phase===1)||((!showInn1)&&m.phase===2))?m.activeBowler.name:null;
+  const teamRuns=showInn1?m.runsA:m.runsB;
+  const teamWkts=showInn1?m.wktsA:m.wktsB;
+  const teamOvers=showInn1?m.oversA:m.oversB;
+  const batTeamName=showInn1?m.tA:m.tB;
+  const bowlTeamName=showInn1?m.tB:m.tA;
+
+  set("sc-batting-team",batTeamName);set("sc-bowling-team",bowlTeamName);
+
+  const batBody=document.getElementById("sc-bat-body");
+  if(batBody){
+    let html="";
+    batters.forEach((bt,i)=>{
+      const isStriker=i===strikerIdx&&!bt.dismissed;
+      const sr=bt.balls>0?((bt.runs/bt.balls)*100).toFixed(1):"0.0";
+      html+=`<tr class="sc-bat-row${isStriker?" striker":""}${bt.dismissed?" dismissed":""}">
+        <td class="sc-td sc-td-name">${bt.name}</td>
+        <td class="sc-td sc-runs-cell${bt.runs>=50?" big-score":""}">${bt.runs}</td>
+        <td class="sc-td">${bt.balls}</td>
+        <td class="sc-td">${bt.fours}</td>
+        <td class="sc-td">${bt.sixes}</td>
+        <td class="sc-td">${sr}</td></tr>`;
+    });
+    if(!html)html=`<tr><td class="sc-td sc-td-name" colspan="6" style="color:var(--mute);text-align:center;padding:14px">Yet to bat</td></tr>`;
+    batBody.innerHTML=html;
+  }
+
+  set("sc-extras",m.extras||0);
+  set("sc-total-score",`${teamRuns+(m.extras||0)}/${teamWkts} (${teamOvers} ov)`);
+
+  const bowlerDisplay=[...bowlers];
+  if(activeBowlerName){
+    const idx=bowlerDisplay.findIndex(b=>b.name===activeBowlerName);
+    if(idx>=0)bowlerDisplay[idx]={...m.activeBowler};
+    else bowlerDisplay.push({...m.activeBowler});
+  }
+  const bowlBody=document.getElementById("sc-bowl-body");
+  if(bowlBody){
+    let html="";
+    bowlerDisplay.forEach(bw=>{
+      const isNow=bw.name===activeBowlerName;
+      const eco=bw.overs>0?(bw.runs/bw.overs).toFixed(2):"0.00";
+      html+=`<tr class="sc-bowl-row${isNow?" bowling-now":""}">
+        <td class="sc-td sc-td-name">${bw.name}</td>
+        <td class="sc-td">${bw.overs}</td>
+        <td class="sc-td">${bw.maidens||0}</td>
+        <td class="sc-td">${bw.runs}</td>
+        <td class="sc-td sc-wkts-cell">${bw.wkts}</td>
+        <td class="sc-td">${eco}</td></tr>`;
+    });
+    if(!html)html=`<tr><td class="sc-td" colspan="6" style="color:var(--mute);text-align:center;padding:14px">No data</td></tr>`;
+    bowlBody.innerHTML=html;
+  }
+
+  const fowChips=document.getElementById("sc-fow-chips");
+  if(fowChips){
+    const fow=m.fow||[];
+    fowChips.innerHTML=fow.length
+      ?fow.map(f=>`<span class="sc-fow-chip">${f.wkt}-${f.runs} <span style="font-weight:400;opacity:.7">(${f.name.split(" ").pop()})</span></span>`).join("")
+      :`<span style="font-size:12px;color:var(--mute);font-family:'JetBrains Mono',monospace">No wickets yet</span>`;
+  }
+
+  const actBats=showInn1?(m.battersA||[]):(m.battersB||[]);
+  const bA=actBats[strikerIdx]||null;
+  const b2i=strikerIdx===0?1:(strikerIdx>0?strikerIdx-1:0);
+  const bB=actBats[b2i]||null;
+  const partnership=(bA&&!bA.dismissed?bA.runs:0)+(bB&&!bB.dismissed?bB.runs:0);
+  const partPct=m.target&&m.phase===2?Math.min(100,(partnership/Math.max(1,m.target-teamRuns+partnership))*100):Math.min(100,(partnership/Math.max(1,teamRuns+1))*80);
+  const pfEl=document.getElementById("sc-partnership-fill");
+  const plEl=document.getElementById("sc-partnership-label");
+  if(pfEl)pfEl.style.width=partPct+"%";
+  if(plEl)plEl.textContent=`Current Partnership: ${partnership} runs`;
+
+  const statusEl=document.getElementById("sc-status-text");
+  if(statusEl){
+    if(m.phase===1){
+      const projRR=(curOv>0?curR/curOv:5);
+      statusEl.textContent=`${m.tA} batting \u2022 Projected: ~${Math.round(projRR*m.maxOv)}`;
+    } else {
+      const needed=m.target-m.runsB;
+      const ballsLeft=Math.max(0,Math.round((m.maxOv-m.oversB)*6));
+      if(needed<=0)statusEl.textContent=`${m.tB} won by ${10-m.wktsB} wickets! \ud83c\udfc6`;
+      else if(ballsLeft<=0)statusEl.textContent=`${m.tA} won by ${needed-1} runs! \ud83c\udfc6`;
+      else statusEl.textContent=`${m.tB} need ${needed} off ${ballsLeft} balls`;
+    }
+  }
+
+  const rrBarsEl=document.getElementById("sc-rr-bars");
+  if(rrBarsEl){
+    const hist=m.rrHist||[];
+    if(hist.length){
+      const maxRR=Math.max(...hist,1);
+      rrBarsEl.style.alignItems="flex-end";
+      rrBarsEl.innerHTML=hist.map((rr,i)=>{
+        const pct=Math.round((rr/maxRR)*100);
+        const barColor=rr>=8?"#e07a25":rr>=6?col("--a"):"#8aa097";
+        return `<div class="sc-rr-bar-wrap"><div class="sc-rr-bar" style="height:${pct}%;background:${barColor}" title="Seg ${i+1}: ${rr}"></div><div class="sc-rr-bar-label">${i*5+1}</div></div>`;
+      }).join("");
+    } else {
+      rrBarsEl.innerHTML=`<span style="font-size:11px;color:var(--mute);font-family:'JetBrains Mono',monospace">Building trend...</span>`;
+    }
+  }
+
+  // Legacy hidden DOM compat
+  set("live-team-a",m.tA);set("live-score-a",`${m.runsA}/${m.wktsA}`);set("live-overs-a",`${m.oversA} ov`);
+  set("live-team-b",m.tB);
+  if(isChase){set("live-score-b",`${m.runsB}/${m.wktsB}`);set("live-overs-b",`${m.oversB} ov`);}
+  else{set("live-score-b","Yet to bat");set("live-overs-b","");}
+}
+
+initLiveMatch();
+renderLiveMatch();
+setInterval(tickLiveMatch, 2800);
+
+// ======= Bowler Head-to-Head Comparison =======
+// Metrics for bowler comparison (lower avg/eco is better → invert for radar)
+const BM = [
+  ["wkts",  "Wickets",  false],
+  ["bavg",  "Average",  true],   // lower is better → invert
+  ["eco",   "Economy",  true],   // lower is better → invert
+  ["fiver", "5-Wicket Hauls", false],
+  ["m",     "Matches",  false]
+];
+
+let BA = null, BB = null; // selected bowler names
+
+function getBowler(name) {
+  return BD.find(p => p.name === name);
+}
+
+// Initialise BA/BB from current BD
+function initBowlerPair() {
+  if (!BD.length) return;
+  if (!BA || !BD.find(p => p.name === BA)) BA = BD[0].name;
+  if (!BB || !BD.find(p => p.name === BB) || BB === BA) BB = BD[1] ? BD[1].name : BD[0].name;
+}
+
+// ---- Bowler combo dropdowns ----
+let comboBPA, comboBPB;
+
+function setupBowlerCombo(prefix, getPlayer, setPlayer) {
+  const combo = document.getElementById(`combo-${prefix}`);
+  const input = document.getElementById(`${prefix}-input`);
+  const menu  = document.getElementById(`${prefix}-menu`);
+  if (!combo || !input || !menu) return null;
+
+  const arrow = combo.querySelector('.combo-arrow');
+
+  function renderBMenu(query = '') {
+    const q = query.trim().toLowerCase();
+    const matches = BD.filter(p => p.name.toLowerCase().includes(q));
+    const current = getPlayer();
+    if (!matches.length) {
+      menu.innerHTML = '<div class="combo-empty">No bowler found</div>';
+      return;
+    }
+    menu.innerHTML = matches.map((p, idx) => `
+      <div class="combo-item${p.name === current ? ' selected' : ''}${idx === 0 && q ? ' active' : ''}" data-name="${p.name}">
+        <span>${p.name}</span>
+        <span class="tag">${p.team}</span>
+      </div>
+    `).join('');
+  }
+
+  function openMenu() {
+    document.querySelectorAll('.combo.open').forEach(c => { if (c !== combo) c.classList.remove('open'); });
+    combo.classList.add('open');
+    const isCurrent = input.value.trim().toLowerCase() === (getPlayer() || '').toLowerCase();
+    renderBMenu(isCurrent ? '' : input.value);
+  }
+
+  function closeMenu() {
+    combo.classList.remove('open');
+    const q = input.value.trim().toLowerCase();
+    if (!q) { input.value = getPlayer() || ''; return; }
+    const match = BD.find(p => p.name.toLowerCase() === q) || BD.find(p => p.name.toLowerCase().includes(q));
+    if (match) { setPlayer(match.name); input.value = match.name; drawBowlerH2H(); }
+    else { input.value = getPlayer() || ''; }
+  }
+
+  function selectBowler(name) {
+    setPlayer(name); input.value = name;
+    combo.classList.remove('open');
+    drawBowlerH2H();
+  }
+
+  if (arrow) arrow.onclick = e => {
+    e.stopPropagation();
+    combo.classList.contains('open') ? closeMenu() : (openMenu(), input.focus(), input.select());
+  };
+
+  input.onclick = e => { e.stopPropagation(); if (!combo.classList.contains('open')) { openMenu(); input.select(); } };
+  input.onfocus = () => { if (!combo.classList.contains('open')) { openMenu(); input.select(); } };
+  input.onblur  = () => setTimeout(() => { if (!combo.contains(document.activeElement)) closeMenu(); }, 160);
+  input.oninput = () => {
+    if (!combo.classList.contains('open')) combo.classList.add('open');
+    renderBMenu(input.value);
+    const exact = BD.find(p => p.name.toLowerCase() === input.value.trim().toLowerCase());
+    if (exact) { setPlayer(exact.name); drawBowlerH2H(); }
+  };
+
+  input.onkeydown = e => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (!combo.classList.contains('open')) { openMenu(); return; }
+      const active = menu.querySelector('.combo-item.active') || menu.querySelector('.combo-item');
+      const next = active ? active.nextElementSibling : menu.querySelector('.combo-item');
+      if (next && next.classList.contains('combo-item')) { if (active) active.classList.remove('active'); next.classList.add('active'); next.scrollIntoView({block:'nearest'}); }
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      const active = menu.querySelector('.combo-item.active');
+      const prev = active ? active.previousElementSibling : null;
+      if (prev && prev.classList.contains('combo-item')) { active.classList.remove('active'); prev.classList.add('active'); prev.scrollIntoView({block:'nearest'}); }
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      const active = menu.querySelector('.combo-item.active') || menu.querySelector('.combo-item');
+      if (active && active.dataset.name) selectBowler(active.dataset.name);
+      else { const q = input.value.trim().toLowerCase(); if (q) { const m2 = BD.find(p => p.name.toLowerCase().includes(q)); if (m2) selectBowler(m2.name); } }
+    } else if (e.key === 'Escape') closeMenu();
+  };
+
+  menu.onclick = e => {
+    e.stopPropagation();
+    const item = e.target.closest('.combo-item');
+    if (item && item.dataset.name) selectBowler(item.dataset.name);
+  };
+
+  return {
+    sync() { if (document.activeElement !== input) input.value = getPlayer() || ''; },
+    close() { if (combo.classList.contains('open')) closeMenu(); }
+  };
+}
+
+comboBPA = setupBowlerCombo('bpa', () => BA, name => { BA = name; });
+comboBPB = setupBowlerCombo('bpb', () => BB, name => { BB = name; });
+
+document.addEventListener('click', e => {
+  if (!e.target.closest('.combo')) {
+    if (comboBPA) comboBPA.close();
+    if (comboBPB) comboBPB.close();
+  }
+});
+
+// ---- Draw bowler H2H ----
+function drawBowlerH2H() {
+  initBowlerPair();
+  if (comboBPA) comboBPA.sync();
+  if (comboBPB) comboBPB.sync();
+
+  const a = getBowler(BA) || BD[0];
+  const b = getBowler(BB) || BD[1];
+  if (!a || !b) return;
+
+  const ca = col('--a'), cb = col('--b'), ink = col('--ink'), grid = 'rgba(128,128,128,.25)';
+
+  // Comparison rows
+  let wa = 0, wb = 0;
+  const cmpEl = document.getElementById('bowl-cmp');
+  if (cmpEl) {
+    cmpEl.innerHTML = BM.map(([k, label, lowerBetter]) => {
+      const av = a[k], bv = b[k];
+      const mx = Math.max(av, bv) || 1;
+      let winner;
+      if (lowerBetter) winner = av < bv ? 'a' : av > bv ? 'b' : '';
+      else             winner = av > bv ? 'a' : av < bv ? 'b' : '';
+      if (winner === 'a') wa++;
+      if (winner === 'b') wb++;
+      const fmtV = v => (k === 'bavg' || k === 'eco') ? v.toFixed(2) : v;
+      // For bars: lower-better metrics → invert bar width
+      const aBar = lowerBetter ? (1 - av / mx) * 100 : av / mx * 100;
+      const bBar = lowerBetter ? (1 - bv / mx) * 100 : bv / mx * 100;
+      return `<div class="row">
+        <div class="side l ${winner==='a'?'win':''}"><div class="bar" style="width:${aBar}%;max-width:calc(100% - 60px)"></div><b>${fmtV(av)}</b></div>
+        <div class="lab">${label}</div>
+        <div class="side r ${winner==='b'?'win':''}"><div class="bar" style="width:${bBar}%;max-width:calc(100% - 60px)"></div><b>${fmtV(bv)}</b></div>
+      </div>`;
+    }).join('');
+  }
+
+  const verdictEl = document.getElementById('bowl-verdict');
+  if (verdictEl) {
+    verdictEl.innerHTML = BA === BB
+      ? 'Pick two different bowlers.'
+      : wa === wb
+        ? `${a.name} and ${b.name} are level.<small>${wa} categories each.</small>`
+        : `${wa > wb ? a.name : b.name} takes it, ${Math.max(wa,wb)}–${Math.min(wa,wb)}.<small>Wins counted across ${BM.length} categories. Average and economy rate reflect bowling quality over raw wickets.</small>`;
+  }
+
+  // Radar — normalise; for lower-better metrics invert the score
+  const mxs = BM.map(([k, , lowerBetter]) => {
+    const mx = Math.max(...BD.map(p => p[k])) || 1;
+    return {mx, lowerBetter};
+  });
+  const rd = p => BM.map(([k], i) => {
+    const raw = p[k] / mxs[i].mx * 100;
+    return +(mxs[i].lowerBetter ? 100 - raw : raw).toFixed(1);
+  });
+
+  try {
+    mk('bowl-radar', {
+      type: 'radar',
+      data: {
+        labels: BM.map(m => m[1]),
+        datasets: [
+          {label: a.name, data: rd(a), borderColor: ca, backgroundColor: ca + '33'},
+          {label: b.name, data: rd(b), borderColor: cb, backgroundColor: cb + '33'}
+        ]
+      },
+      options: {
+        maintainAspectRatio: false,
+        scales: { r: {min:0,max:100,ticks:{display:false},grid:{color:grid},angleLines:{color:grid},pointLabels:{color:ink}} },
+        plugins: {title: {display:true, text:'Profile (100 = best in dataset)', color:ink}}
+      }
+    });
+  } catch(err) { console.warn('Bowl radar error:', err); }
+
+  // Bar — top wicket takers from current BD
+  const top = [...BD].sort((x,y) => y.wkts - x.wkts).slice(0, 8);
+  try {
+    mk('bowl-bar', {
+      type: 'bar',
+      data: {
+        labels: top.map(p => p.name.split(' ').slice(-1)[0]),
+        datasets: [{
+          label: 'Wickets',
+          data: top.map(p => p.wkts),
+          backgroundColor: top.map(p => p.name === BA ? ca : p.name === BB ? cb : '#8aa097')
+        }]
+      },
+      options: {
+        maintainAspectRatio: false,
+        indexAxis: 'y',
+        plugins: {
+          legend: {display:false},
+          title: {display:true, text:'Career wickets (top 8, A and B highlighted)', color:ink}
+        },
+        scales: {x:{grid:{color:grid}}, y:{grid:{display:false}}}
+      }
+    });
+  } catch(err) { console.warn('Bowl bar error:', err); }
+}
+
+// ---- H2H tab switch ----
+let h2hTab = 'bat';
+function switchH2HTab(tab) {
+  h2hTab = tab;
+  const batSec  = document.getElementById('h2h-bat-section');
+  const bowlSec = document.getElementById('h2h-bowl-section');
+  const tabBat  = document.getElementById('h2h-bat');
+  const tabBowl = document.getElementById('h2h-bowl');
+
+  if (tab === 'bat') {
+    if (batSec)  batSec.style.display  = '';
+    if (bowlSec) bowlSec.style.display = 'none';
+    if (tabBat)  tabBat.classList.add('active');
+    if (tabBowl) tabBowl.classList.remove('active');
+  } else {
+    if (batSec)  batSec.style.display  = 'none';
+    if (bowlSec) bowlSec.style.display = '';
+    if (tabBat)  tabBat.classList.remove('active');
+    if (tabBowl) tabBowl.classList.add('active');
+    // Sync bowler data to current format then redraw
+    BD = BOWL_SETS[FMT];
+    initBowlerPair();
+    if (comboBPA) comboBPA.sync();
+    if (comboBPB) comboBPB.sync();
+    drawBowlerH2H();
+  }
+}
+
+(function() {
+  const hb = document.getElementById('h2h-bat');  if (hb) hb.onclick = () => switchH2HTab('bat');
+  const hw = document.getElementById('h2h-bowl'); if (hw) hw.onclick = () => switchH2HTab('bowl');
+
+  // When global format changes, update bowler H2H too
+  const fmtEl = document.getElementById('fmt');
+  if (fmtEl) fmtEl.addEventListener('click', () => setTimeout(() => {
+    if (h2hTab === 'bowl') {
+      BD = BOWL_SETS[FMT];
+      initBowlerPair();
+      if (comboBPA) comboBPA.sync();
+      if (comboBPB) comboBPB.sync();
+      drawBowlerH2H();
+    }
+  }, 80));
+})();
+
+// Initial render of bowler H2H data (hidden, ready when tab is clicked)
+initBowlerPair();
+if (comboBPA) comboBPA.sync();
+if (comboBPB) comboBPB.sync();
