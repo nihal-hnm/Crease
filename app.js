@@ -826,8 +826,7 @@ function simulateLiveBall() {
   draw(true, targetName);
 }
 
-// Start real-time simulation updates every 3.5 seconds
-setInterval(simulateLiveBall, 3500);
+// Career stats are now refreshed from the real CricAPI on page load (see refreshCareerStats below)
 
 draw();
 
@@ -994,7 +993,244 @@ function switchPlayerTab(tab) {
   if(fmtEl) fmtEl.addEventListener("click",()=>setTimeout(()=>{BD=BOWL_SETS[FMT];if(playerTab==="bowl"){fillBowlSelect();drawBowlerTable();}},60));
 })();
 
-// ======= Live Match Panel Simulation =======
+// =====================================================
+// ======= Cricket API Integration (RapidAPI) ========
+// =====================================================
+const CRIC_KEY  = '14cdb2a5f3msh29dcd396889f155p110e86jsnaf85cd2c2f1c';
+const CRIC_HOST = 'cricapi.p.rapidapi.com';
+
+async function cricFetch(path) {
+  const r = await fetch(`https://${CRIC_HOST}/v1${path}`, {
+    headers: { 'X-RapidAPI-Key': CRIC_KEY, 'X-RapidAPI-Host': CRIC_HOST }
+  });
+  if (!r.ok) throw new Error(`HTTP ${r.status}`);
+  const j = await r.json();
+  if (j.status !== 'success') throw new Error(j.reason || `API: ${j.status}`);
+  return j.data;
+}
+
+// UUID cache backed by localStorage so searches only run once per session
+let _uc = {};
+try { _uc = JSON.parse(localStorage.getItem('crease-uuids') || '{}'); } catch(e) {}
+const _saveUc = () => { try { localStorage.setItem('crease-uuids', JSON.stringify(_uc)); } catch(e) {} };
+
+async function _playerUuid(name) {
+  if (_uc[name]) return _uc[name];
+  const data = await cricFetch(`/players_search?search=${encodeURIComponent(name)}`);
+  const arr = Array.isArray(data) ? data : [];
+  const last = (name.split(' ').pop() || '').toLowerCase();
+  const hit  = arr.find(p => {
+    const pn = (p.name || '').toLowerCase();
+    return pn === name.toLowerCase() || pn.includes(last);
+  });
+  if (hit?.id) { _uc[name] = hit.id; _saveUc(); }
+  return hit?.id || null;
+}
+
+// Active players whose career stats we pull from the API (capped to save quota)
+const API_REFRESH_PLAYERS = [
+  'Virat Kohli', 'Rohit Sharma', 'Joe Root', 'Babar Azam', 'Steve Smith',
+  'Shubman Gill', 'Travis Head', 'Ben Stokes', 'Kane Williamson', 'Mohammad Rizwan'
+];
+const _fmtApiMap = { ODI: 'ODIs', Test: 'Tests', T20I: 'T20Is' };
+
+async function refreshCareerStats() {
+  let n = 0;
+  for (const name of API_REFRESH_PLAYERS) {
+    if (n >= 7) break;   // keep well within 100 req/day free limit
+    try {
+      const uuid = await _playerUuid(name);
+      if (!uuid) continue;
+      const pd = await cricFetch(`/player_info?id=${uuid}`);
+      if (!pd?.stats) continue;
+      pd.stats.forEach(s => {
+        if (s.fn !== 'Batting' || !s.values) return;
+        const fk = Object.keys(_fmtApiMap).find(k => _fmtApiMap[k] === s.type);
+        if (!fk) return;
+        const p = SETS[fk]?.find(x => x.name === name);
+        if (!p) return;
+        const v = s.values;
+        if (+v.Runs > 0)       p.runs = +v.Runs;
+        if (+v.Ave  > 0)       p.avg  = +parseFloat(v.Ave).toFixed(1);
+        if (+v.SR   > 0)       p.sr   = +parseFloat(v.SR).toFixed(1);
+        if (+v['100'] >= 0)    p.c    = +v['100'];
+        if (+v['50']  >= 0)    p.f    = +v['50'];
+        if (+v.Mat   > 0)      p.m    = +v.Mat;
+      });
+      n++;
+      if (D === SETS[FMT]) draw();
+    } catch(e) { console.warn('Stats skip:', name, e.message); }
+    await new Promise(res => setTimeout(res, 300));
+  }
+}
+
+// --- Real Live Scorecard ---
+let _liveTimer = null, _apiMatchId = null, _apiMatchMeta = null;
+
+async function startApiLive() {
+  try {
+    const list = await cricFetch('/currentMatches?offset=0');
+    const matches = Array.isArray(list) ? list : [];
+    if (!matches.length) throw new Error('No matches returned');
+
+    // Prefer live international matches; fall back to any available
+    const pick =
+      matches.find(m => ['odi','test','t20'].includes((m.matchType||'').toLowerCase()) && m.matchStarted && !m.matchEnded) ||
+      matches.find(m => ['odi','test','t20'].includes((m.matchType||'').toLowerCase())) ||
+      matches[0];
+
+    _apiMatchId   = pick.id;
+    _apiMatchMeta = pick;
+    await _showScorecard();
+    _liveTimer = setInterval(_showScorecard, 45000);   // refresh every 45 s
+    setTimeout(refreshCareerStats, 2000);              // refresh player stats shortly after
+  } catch(e) {
+    console.warn('API live failed → simulation fallback:', e.message);
+    initLiveMatch(); renderLiveMatch();
+    setInterval(tickLiveMatch, 2800);
+    setTimeout(refreshCareerStats, 2000);
+  }
+}
+
+async function _showScorecard() {
+  const sc = await cricFetch(`/match_scorecard?id=${_apiMatchId}`);
+  _renderApiScorecard(_apiMatchMeta, sc);
+}
+
+function _renderApiScorecard(meta, sc) {
+  const set = (id, txt) => { const el = document.getElementById(id); if (el) el.textContent = String(txt ?? ''); };
+
+  const teams   = sc?.teams   || meta?.teams   || ['—', '—'];
+  const tA      = teams[0] || '—';
+  const tB      = teams[1] || '—';
+  const fmtLbl  = (sc?.matchType || meta?.matchType || 'MATCH').toUpperCase();
+
+  set('live-fixture', `${tA} vs ${tB} \u2022 ${fmtLbl}`);
+
+  const scores = sc?.score || meta?.score || [];
+  const s1 = scores[0] || {}, s2 = scores[1] || {};
+
+  set('sc-sum-team-a', tA);
+  set('sc-sum-score-a', s1.r !== undefined ? `${s1.r}/${s1.w ?? '?'}` : '\u2014');
+  set('sc-sum-overs-a', s1.o !== undefined ? `${s1.o} ov` : '');
+  set('sc-sum-team-b', tB);
+  set('sc-sum-score-b', s2.r !== undefined ? `${s2.r}/${s2.w ?? '?'}` : 'Yet to bat');
+  set('sc-sum-overs-b', s2.o !== undefined ? `${s2.o} ov` : '');
+
+  // CRR from the currently active innings
+  const actS = (s2.r !== undefined && !sc?.matchEnded) ? s2 : s1;
+  set('live-crr', actS.o > 0 ? (actS.r / actS.o).toFixed(2) : '0.00');
+
+  // RRR if chasing
+  const rrb = document.getElementById('sc-rrr-block');
+  if (s2.r !== undefined && s1.r !== undefined && !sc?.matchEnded) {
+    const maxOv = fmtLbl === 'TEST' ? 90 : fmtLbl === 'ODI' ? 50 : 20;
+    const need  = (s1.r + 1) - s2.r;
+    const balls = Math.max(1, Math.round((maxOv - (s2.o || 0)) * 6));
+    set('live-rrr', ((need / balls) * 6).toFixed(2));
+    if (rrb) rrb.style.display = '';
+  } else { if (rrb) rrb.style.display = 'none'; }
+
+  const lb = document.getElementById('live-last-ball');
+  if (lb) { lb.textContent = '\u2014'; lb.className = 'live-last-ball'; }
+
+  set('sc-status-text', sc?.status || meta?.status || 'Match in progress');
+
+  // Innings tab highlight
+  const t1 = document.getElementById('sc-tab-1'), t2 = document.getElementById('sc-tab-2');
+  if (t1) t1.classList.toggle('active', currentScorecardInn === 1);
+  if (t2) t2.classList.toggle('active', currentScorecardInn === 2);
+
+  const innings = sc?.innings || [];
+  const inn = innings[currentScorecardInn - 1] || innings[0] || {};
+
+  set('sc-batting-team',  currentScorecardInn === 1 ? tA : tB);
+  set('sc-bowling-team', currentScorecardInn === 1 ? tB : tA);
+
+  // Batting table
+  const batBody = document.getElementById('sc-bat-body');
+  if (batBody) {
+    const bats = inn.batsman || inn.batsmen || [];
+    let h = '';
+    bats.forEach(bt => {
+      const r   = +(bt.r   ?? bt.runs  ?? 0);
+      const b   = +(bt.b   ?? bt.balls ?? 0);
+      const frs = +(bt['4s'] ?? bt.fours ?? 0);
+      const sxs = +(bt['6s'] ?? bt.sixes ?? 0);
+      const sr  = b > 0 ? ((r / b) * 100).toFixed(1) : '0.0';
+      const out = !!(bt.dismissal || bt['out-by'] || bt.isOut);
+      h += `<tr class="sc-bat-row${out ? ' dismissed' : ''}">
+        <td class="sc-td sc-td-name">${bt.batsman || bt.name || '\u2014'}${!out ? ' *' : ''}</td>
+        <td class="sc-td sc-runs-cell${r >= 50 ? ' big-score' : ''}">${r}</td>
+        <td class="sc-td">${b}</td>
+        <td class="sc-td">${frs}</td>
+        <td class="sc-td">${sxs}</td>
+        <td class="sc-td">${sr}</td></tr>`;
+    });
+    if (!h) h = `<tr><td class="sc-td sc-td-name" colspan="6" style="color:var(--mute);text-align:center;padding:14px">No batting data yet</td></tr>`;
+    batBody.innerHTML = h;
+  }
+
+  set('sc-extras', inn.extras ?? '0');
+  const innScore = scores[currentScorecardInn - 1];
+  set('sc-total-score', inn.total || (innScore ? `${innScore.r}/${innScore.w} (${innScore.o} ov)` : '\u2014'));
+
+  // Bowling table
+  const bowlBody = document.getElementById('sc-bowl-body');
+  if (bowlBody) {
+    const bwls = inn.bowler || inn.bowlers || [];
+    let h = '';
+    bwls.forEach(bw => {
+      const ov  = parseFloat(bw.o ?? 0);
+      const r   = +(bw.r ?? 0);
+      const eco = bw.eco !== undefined ? bw.eco : (ov > 0 ? (r / ov).toFixed(2) : '0.00');
+      h += `<tr class="sc-bowl-row">
+        <td class="sc-td sc-td-name">${bw.bowler || bw.name || '\u2014'}</td>
+        <td class="sc-td">${bw.o ?? 0}</td>
+        <td class="sc-td">${bw.m ?? 0}</td>
+        <td class="sc-td">${bw.r ?? 0}</td>
+        <td class="sc-td sc-wkts-cell">${bw.w ?? 0}</td>
+        <td class="sc-td">${eco}</td></tr>`;
+    });
+    if (!h) h = `<tr><td class="sc-td" colspan="6" style="color:var(--mute);text-align:center;padding:14px">No bowling data yet</td></tr>`;
+    bowlBody.innerHTML = h;
+  }
+
+  // Fall of wickets
+  const fowEl = document.getElementById('sc-fow-chips');
+  if (fowEl) {
+    const fow = inn.fow || inn.fallOfWickets || [];
+    fowEl.innerHTML = fow.length
+      ? fow.map(f => `<span class="sc-fow-chip">${f.number ?? f.wkt ?? '?'}-${f.runs ?? '?'} <span style="font-weight:400;opacity:.7">(${(f.batsman || f.name || '?').split(' ').pop()})</span></span>`).join('')
+      : `<span style="font-size:12px;color:var(--mute);font-family:'JetBrains Mono',monospace">No wickets fallen</span>`;
+  }
+
+  // Partnership
+  const pfEl = document.getElementById('sc-partnership-fill');
+  const plEl = document.getElementById('sc-partnership-label');
+  if (pfEl) pfEl.style.width = '0%';
+  if (plEl) plEl.textContent = 'Partnership data loading\u2026';
+
+  // Run rate bar — show a simple live indicator
+  const rrBarsEl = document.getElementById('sc-rr-bars');
+  if (rrBarsEl) {
+    const hist = inn.overHistory || inn.overs || [];
+    if (hist.length) {
+      const maxRR = Math.max(...hist.map(ov => ov.rr || 0), 1);
+      rrBarsEl.style.alignItems = 'flex-end';
+      rrBarsEl.innerHTML = hist.slice(-12).map((ov, i) => {
+        const rr = ov.rr || 0;
+        const pct = Math.round((rr / maxRR) * 100);
+        const bc  = rr >= 8 ? '#e07a25' : rr >= 6 ? col('--a') : '#8aa097';
+        return `<div class="sc-rr-bar-wrap"><div class="sc-rr-bar" style="height:${pct}%;background:${bc}" title="RR: ${rr}"></div><div class="sc-rr-bar-label">${ov.ovr || i + 1}</div></div>`;
+      }).join('');
+    } else {
+      rrBarsEl.innerHTML = `<span style="font-size:11px;color:var(--mute);font-family:'JetBrains Mono',monospace">\u2714 Live data via CricAPI</span>`;
+    }
+  }
+}
+
+// ======= Live Match Panel Simulation (fallback when API has no live match) =======
 const MT=["IND","AUS","ENG","PAK","SA","NZ","SL","WI","BAN","AFG"];
 const BAT_POOL={
   IND:["Rohit Sharma","Virat Kohli","Shubman Gill","KL Rahul","Rishabh Pant","Hardik Pandya","Yashasvi Jaiswal"],
@@ -1344,9 +1580,7 @@ function renderLiveMatch(){
   else{set("live-score-b","Yet to bat");set("live-overs-b","");}
 }
 
-initLiveMatch();
-renderLiveMatch();
-setInterval(tickLiveMatch, 2800);
+startApiLive(); // Real API-powered live scorecard; auto-falls back to simulation if offline
 
 // ======= Bowler Head-to-Head Comparison =======
 // Metrics for bowler comparison (lower avg/eco is better → invert for radar)
